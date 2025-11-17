@@ -2,6 +2,7 @@ package vn.dangthehao.train.exception;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -12,10 +13,13 @@ import vn.dangthehao.train.dto.common.ApiResponse;
 import vn.dangthehao.train.dto.common.ErrorDetail;
 import vn.dangthehao.train.util.ApiResponseBuilder;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalException {
   @ExceptionHandler(AppException.class)
@@ -42,8 +46,17 @@ public class GlobalException {
     ErrorCode errorCode = ErrorCode.FAILED_VALIDATION;
     Throwable cause = ex.getMostSpecificCause();
 
-    if (cause instanceof InvalidFormatException ife) {
-      return handleInvalidFormatEx(ife, errorCode);
+    switch (cause) {
+      case InvalidFormatException ife -> {
+        return handleInvalidFormatEx(ife, errorCode);
+      }
+      case DateTimeParseException dtpe -> {
+        return handleDateTimeParseEx(ex, dtpe, errorCode);
+      }
+      case DateTimeException dte -> {
+        return handleDateTimeEx(ex, dte, errorCode);
+      }
+      default -> {}
     }
 
     // General res for other exception
@@ -100,5 +113,57 @@ public class GlobalException {
 
     return String.format(
         "Invalid value '%s'. Expected type: %s", value, targetType.getSimpleName());
+  }
+
+  private ResponseEntity<ApiResponse<Void>> handleDateTimeParseEx(
+      HttpMessageNotReadableException ex, DateTimeParseException dtpe, ErrorCode errorCode) {
+    log.error("DateTimeParseException");
+    ErrorDetail errorDetail = getErrorDetail(ex);
+    errorDetail.setError(
+        String.format(
+            "Invalid date format '%s'. Expected format: 'yyyy-MM-dd'", dtpe.getParsedString()));
+
+    return ResponseEntity.status(errorCode.getHttpStatus())
+        .body(
+            ApiResponseBuilder.error(
+                errorCode.getCode(), errorCode.getMessage(), List.of(errorDetail)));
+  }
+
+  private ResponseEntity<ApiResponse<Void>> handleDateTimeEx(
+      HttpMessageNotReadableException ex, DateTimeException dte, ErrorCode errorCode) {
+    log.error("DateTimeException");
+    ErrorDetail errorDetail = getErrorDetail(ex);
+    errorDetail.setError(dte.getMessage());
+
+    return ResponseEntity.status(errorCode.getHttpStatus())
+        .body(
+            ApiResponseBuilder.error(
+                errorCode.getCode(), errorCode.getMessage(), List.of(errorDetail)));
+  }
+
+  private ErrorDetail getErrorDetail(HttpMessageNotReadableException ex) {
+    String object = "Request";
+    String field = "Unknown";
+
+    JsonMappingException jme = findJsonMappingException(ex);
+    if (jme != null && !jme.getPath().isEmpty()) {
+      JsonMappingException.Reference reference = jme.getPath().getFirst();
+      object = reference.getFrom().getClass().getSimpleName();
+      field = reference.getFieldName();
+    }
+
+    return ErrorDetail.builder().object(object).field(field).build();
+  }
+
+  private JsonMappingException findJsonMappingException(Throwable throwable) {
+    Throwable cause = throwable.getCause();
+    while (cause != null) {
+      if (cause instanceof JsonMappingException jme) {
+        return jme;
+      }
+      cause = cause.getCause();
+    }
+
+    return null;
   }
 }
