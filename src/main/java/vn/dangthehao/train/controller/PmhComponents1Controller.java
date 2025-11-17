@@ -1,0 +1,69 @@
+package vn.dangthehao.train.controller;
+
+import jakarta.validation.Valid;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import vn.dangthehao.train.dto.component.request.CreatePmhComponentRequest;
+import vn.dangthehao.train.dto.component.request.SearchPmhComponentRequest;
+import vn.dangthehao.train.dto.common.ApiResponse;
+import vn.dangthehao.train.dto.component.request.UpdatePmhComponentRequest;
+import vn.dangthehao.train.dto.component.response.PmhComponentResponse;
+import vn.dangthehao.train.dto.component.response.SearchPmhComponentResponse;
+import vn.dangthehao.train.service.pmhComponents1.PmhComponents1Service;
+import vn.dangthehao.train.util.ApiResponseBuilder;
+
+import java.net.URI;
+
+@RestController
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
+@RequestMapping("/api/pmh-components")
+public class PmhComponents1Controller {
+  PmhComponents1Service pmhComponents1Service;
+
+  @PostMapping("/search")
+  public ResponseEntity<ApiResponse<SearchPmhComponentResponse>> searchComponent(
+      @Valid @RequestBody SearchPmhComponentRequest request) {
+    ApiResponse<SearchPmhComponentResponse> response =
+        ApiResponseBuilder.success(pmhComponents1Service.searchComponent(request));
+
+    return ResponseEntity.ok(response);
+  }
+
+  @PostMapping
+  public ResponseEntity<ApiResponse<PmhComponentResponse>> createComponent(
+      @Valid @RequestBody CreatePmhComponentRequest request) {
+    ApiResponse<PmhComponentResponse> response =
+        ApiResponseBuilder.success(pmhComponents1Service.createComponent(request));
+
+    URI location = getComponentUri(response.getData().getId());
+
+    return ResponseEntity.created(location).body(response);
+  }
+
+  @PutMapping("/{id}")
+  public ResponseEntity<ApiResponse<PmhComponentResponse>> updateComponent(
+      @PathVariable(name = "id") Long id, @Valid @RequestBody UpdatePmhComponentRequest request) {
+    ApiResponse<PmhComponentResponse> response =
+        ApiResponseBuilder.success(pmhComponents1Service.updateComponent(id, request));
+
+    return ResponseEntity.ok(response);
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<ApiResponse<Void>> deleteComponentById(@PathVariable(name = "id") Long id) {
+    pmhComponents1Service.deleteComponentById(id);
+    return ResponseEntity.ok(ApiResponseBuilder.success());
+  }
+
+  private URI getComponentUri(Long id) {
+    return ServletUriComponentsBuilder.fromCurrentRequest()
+        .path("/{id}")
+        .buildAndExpand(id)
+        .toUri();
+  }
+}
