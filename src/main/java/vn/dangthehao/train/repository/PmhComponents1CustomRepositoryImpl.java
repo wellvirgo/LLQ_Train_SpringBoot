@@ -1,9 +1,6 @@
 package vn.dangthehao.train.repository;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.ParameterMode;
-import jakarta.persistence.StoredProcedureQuery;
-import jakarta.persistence.TypedQuery;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,36 +21,25 @@ import java.util.Map;
 public class PmhComponents1CustomRepositoryImpl implements PmhComponents1CustomRepository {
   EntityManager entityManager;
 
-  static final String WHERE_CLAUSE = " where 1=1";
+  static final String WHERE_CLAUSE = " WHERE 1=1";
 
   @Override
   public PageResult<PmhComponents1> findAllUseEntityManger(
       SearchPmhComponentRequest searchRequest) {
-    StringBuilder jpql = new StringBuilder("select p from PmhComponents1 p").append(WHERE_CLAUSE);
-    TypedQuery<PmhComponents1> query = buildTypedQuery(PmhComponents1.class, searchRequest, jpql);
+    StringBuilder nativeSql =
+        new StringBuilder("SELECT * FROM PMH_COMPONENTS_1").append(WHERE_CLAUSE);
+    Query query = buildNativeQuery(PmhComponents1.class, searchRequest, nativeSql);
 
-    int requestedPage = searchRequest.getPageOrDefault();
-    int requestedSize = searchRequest.getSizeOrDefault();
-
-    int startPos = (requestedPage - 1) * requestedSize;
-    query.setFirstResult(startPos);
-    query.setMaxResults(requestedSize);
-    List<PmhComponents1> resultList = query.getResultList();
-
-    long totalElements = countElements(searchRequest);
-    int totalPages = (int) Math.ceil((double) totalElements / requestedSize);
-
-    return PageResultBuilder.build(
-        resultList, requestedPage, resultList.size(), totalElements, totalPages);
+    return getPageResult(query, searchRequest);
   }
 
   @Override
-  public long countElements(SearchPmhComponentRequest searchRequest) {
-    StringBuilder jpql =
-        new StringBuilder("select count(p.id) from PmhComponents1 p").append(WHERE_CLAUSE);
-    TypedQuery<Long> query = buildTypedQuery(Long.class, searchRequest, jpql);
+  public long count(SearchPmhComponentRequest searchRequest) {
+    StringBuilder sql =
+        new StringBuilder("SELECT COUNT(ID) FROM PMH_COMPONENTS_1").append(WHERE_CLAUSE);
+    Query query = buildNativeQuery(Long.class, searchRequest, sql);
 
-    return query.getSingleResult();
+    return (Long) query.getSingleResult();
   }
 
   @Override
@@ -66,7 +52,7 @@ public class PmhComponents1CustomRepositoryImpl implements PmhComponents1CustomR
     setOtParameters(query);
     query.execute();
 
-    return getResultFromSearchProcedure(query);
+    return getPageResult(query);
   }
 
   private static boolean isNotNullOrBlank(String value) {
@@ -78,80 +64,97 @@ public class PmhComponents1CustomRepositoryImpl implements PmhComponents1CustomR
   }
 
   private void buildSql(
-      SearchPmhComponentRequest searchRequest, StringBuilder jpql, Map<String, Object> parameters) {
+      SearchPmhComponentRequest searchRequest, StringBuilder sql, Map<String, Object> parameters) {
     if (isNotNullOrBlank(searchRequest.getComponentCode())) {
-      jpql.append(" and LOWER(componentCode) = :componentCode");
+      sql.append(" AND LOWER(COMPONENT_CODE) = :componentCode");
       parameters.put("componentCode", searchRequest.getComponentCode().toLowerCase());
     }
 
     if (isNotNullOrBlank(searchRequest.getComponentName())) {
-      jpql.append(" and LOWER(componentName) like :componentName");
+      sql.append(" AND LOWER(COMPONENT_NAME) like :componentName");
       parameters.put("componentName", "%" + searchRequest.getComponentName().toLowerCase() + "%");
     }
 
     if (isNotNullOrBlank(searchRequest.getMessageType())) {
-      jpql.append(" and LOWER(messageType) like :messageType");
+      sql.append(" AND LOWER(MESSAGE_TYPE) like :messageType");
       parameters.put("messageType", "%" + searchRequest.getMessageType().toLowerCase() + "%");
     }
 
     if (isNotNullOrBlank(searchRequest.getConnectionMethod())) {
-      jpql.append(" and LOWER(connectionMethod) like :connectionMethod");
+      sql.append(" AND LOWER(CONNECTION_METHOD) like :connectionMethod");
       parameters.put(
           "connectionMethod", "%" + searchRequest.getConnectionMethod().toLowerCase() + "%");
     }
 
     if (isNotNullOrBlank(searchRequest.getCheckToken())) {
-      jpql.append(" and LOWER(checkToken) = :checkToken");
+      sql.append(" AND LOWER(CHECK_TOKEN) = :checkToken");
       parameters.put("checkToken", searchRequest.getCheckToken().toLowerCase());
     }
 
     if (isNotNull(searchRequest.getIsDisplay())) {
-      jpql.append(" and isDisplay = :isDisplay");
+      sql.append(" AND IS_DISPLAY = :isDisplay");
       parameters.put("isDisplay", searchRequest.getIsDisplay());
     }
 
     if (isNotNull(searchRequest.getStatus())) {
-      jpql.append(" and status = :status");
+      sql.append(" AND STATUS = :status");
       parameters.put("status", searchRequest.getStatus());
     }
 
     if (isNotNull(searchRequest.getIsActive())) {
-      jpql.append(" and isActive = :isActive");
+      sql.append(" AND IS_ACTIVE = :isActive");
       parameters.put("isActive", searchRequest.getIsActive());
     }
 
     if (isNotNull(searchRequest.getEffectiveDateFrom())) {
-      jpql.append(" and effectiveDate >= :effectiveDateFrom");
+      sql.append(" AND EFFECTIVE_DATE >= :effectiveDateFrom");
       parameters.put("effectiveDateFrom", searchRequest.getEffectiveDateFrom());
     }
 
     if (isNotNull(searchRequest.getEffectiveDateTo())) {
-      jpql.append(" and effectiveDate <= :effectiveDateTo");
+      sql.append(" AND EFFECTIVE_DATE <= :effectiveDateTo");
       parameters.put("effectiveDateTo", searchRequest.getEffectiveDateTo());
     }
 
     if (isNotNull(searchRequest.getEndEffectiveDateFrom())) {
-      jpql.append(" and endEffectiveDate >= :endEffectiveDateFrom");
+      sql.append(" AND END_EFFECTIVE_DATE >= :endEffectiveDateFrom");
       parameters.put("endEffectiveDateFrom", searchRequest.getEndEffectiveDateFrom());
     }
 
     if (isNotNull(searchRequest.getEndEffectiveDateTo())) {
-      jpql.append(" and endEffectiveDate <= :endEffectiveDateTo");
+      sql.append(" AND END_EFFECTIVE_DATE <= :endEffectiveDateTo");
       parameters.put("endEffectiveDateTo", searchRequest.getEndEffectiveDateTo());
     }
 
-    jpql.append(" order by id");
+    sql.append(" ORDER BY ID");
   }
 
-  private <T> TypedQuery<T> buildTypedQuery(
-      Class<T> entityClass, SearchPmhComponentRequest searchRequest, StringBuilder jpql) {
+  private <T> Query buildNativeQuery(
+      Class<T> entityClass, SearchPmhComponentRequest searchRequest, StringBuilder sql) {
     Map<String, Object> parameters = new HashMap<>();
-    buildSql(searchRequest, jpql, parameters);
+    buildSql(searchRequest, sql, parameters);
 
-    TypedQuery<T> query = entityManager.createQuery(jpql.toString(), entityClass);
+    Query query = entityManager.createNativeQuery(sql.toString(), entityClass);
     parameters.forEach(query::setParameter);
 
     return query;
+  }
+
+  private PageResult<PmhComponents1> getPageResult(
+      Query query, SearchPmhComponentRequest searchRequest) {
+    int requestedPage = searchRequest.getPageOrDefault();
+    int requestedSize = searchRequest.getSizeOrDefault();
+
+    int startPos = (requestedPage - 1) * requestedSize;
+    query.setFirstResult(startPos);
+    query.setMaxResults(requestedSize);
+    List<PmhComponents1> resultList = (List<PmhComponents1>) query.getResultList();
+
+    long totalElements = count(searchRequest);
+    int totalPages = (int) Math.ceil((double) totalElements / requestedSize);
+
+    return PageResultBuilder.build(
+        resultList, requestedPage, resultList.size(), totalElements, totalPages);
   }
 
   private void setInParameters(
@@ -215,7 +218,7 @@ public class PmhComponents1CustomRepositoryImpl implements PmhComponents1CustomR
     query.registerStoredProcedureParameter("p_total_pages", Integer.class, ParameterMode.OUT);
   }
 
-  private PageResult<PmhComponents1> getResultFromSearchProcedure(StoredProcedureQuery query) {
+  private PageResult<PmhComponents1> getPageResult(StoredProcedureQuery query) {
     List<PmhComponents1> result = query.getResultList();
     Integer page = (Integer) query.getOutputParameterValue("p_out_page");
     Integer size = (Integer) query.getOutputParameterValue("p_out_size");

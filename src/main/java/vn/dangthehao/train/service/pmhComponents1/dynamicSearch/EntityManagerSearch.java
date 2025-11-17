@@ -15,12 +15,12 @@ import vn.dangthehao.train.repository.PmhComponents1Repository;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class EntityManagerJPQLSearch implements SearchComponentService {
+public class EntityManagerSearch implements SearchComponentService {
   PmhComponents1Repository pmhComponents1Repository;
 
   @Override
   public PageResult<PmhComponents1> search(SearchPmhComponentRequest request) {
-    log.info(SearchTech.ENTITY_MANAGER_JPQL.name());
+    log.info(SearchTech.ENTITY_MANAGER.name());
     return pmhComponents1Repository.findAllUseEntityManger(request);
   }
 }

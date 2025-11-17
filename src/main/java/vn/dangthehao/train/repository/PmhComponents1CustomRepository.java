@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface PmhComponents1CustomRepository {
   PageResult<PmhComponents1> findAllUseEntityManger(SearchPmhComponentRequest request);
-  long countElements(SearchPmhComponentRequest request);
+  long count(SearchPmhComponentRequest request);
   PageResult<PmhComponents1> findAllUseProcedure(SearchPmhComponentRequest request);
 }
