@@ -4,6 +4,9 @@ import jakarta.validation.constraints.Min;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.domain.Sort;
+import vn.dangthehao.train.enums.ComponentSortField;
+import vn.dangthehao.train.enums.SortDirection;
 
 @Getter
 @Setter
@@ -11,8 +14,36 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PageableRequest {
-    @Min(value = 1, message = "Page number must be greater than 0")
-    Integer page;
-    @Min(value = 0, message = "Page size must be at least 0")
-    Integer size;
+  static final Integer DEFAULT_PAGE_NUMBER = 1;
+  static final Integer DEFAULT_PAGE_SIZE = 20;
+
+  @Min(value = 1, message = "Page number must be greater than 0")
+  Integer page;
+
+  @Min(value = 0, message = "Page size must be at least 0")
+  Integer size;
+
+  ComponentSortField sortField;
+  SortDirection sortDirection;
+
+  public Integer getPageOrDefault() {
+    if (this.getPage() == null) return DEFAULT_PAGE_NUMBER;
+    return this.getPage();
+  }
+
+  public Integer getSizeOrDefault() {
+    if (this.getSize() == null) return DEFAULT_PAGE_SIZE;
+    return this.getSize();
+  }
+
+  public ComponentSortField getSortFieldOrDefault() {
+    if (sortField != null) return sortField;
+    return ComponentSortField.ID; // default sort by ID
+  }
+
+  public Sort.Direction getSortDirectionOrDefault() {
+    if (sortDirection != null && sortDirection.equals(SortDirection.DESC))
+      return Sort.Direction.DESC;
+    return Sort.Direction.ASC;
+  }
 }

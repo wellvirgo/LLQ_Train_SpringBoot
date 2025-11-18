@@ -15,8 +15,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SearchPmhComponentRequest extends PageableRequest {
-  static final Integer DEFAULT_PAGE_NUMBER = 1;
-  static final Integer DEFAULT_PAGE_SIZE = 20;
   static final SearchTech DEFAULT_SEARCH_TECH = SearchTech.JPA_SPECIFICATION;
 
   String componentCode;
@@ -44,16 +42,6 @@ public class SearchPmhComponentRequest extends PageableRequest {
   LocalDate endEffectiveDateTo;
 
   SearchTech searchTech;
-
-  public Integer getPageOrDefault() {
-    if (this.getPage() == null) return DEFAULT_PAGE_NUMBER;
-    return this.getPage();
-  }
-
-  public Integer getSizeOrDefault() {
-    if (this.getSize() == null) return DEFAULT_PAGE_SIZE;
-    return this.getSize();
-  }
 
   public SearchTech getSearchTechOrDefault() {
     if (this.getSearchTech() == null) return DEFAULT_SEARCH_TECH;

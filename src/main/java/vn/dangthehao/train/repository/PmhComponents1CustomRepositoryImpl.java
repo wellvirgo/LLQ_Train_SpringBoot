@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import vn.dangthehao.train.dto.common.PageResult;
 import vn.dangthehao.train.dto.component.request.SearchPmhComponentRequest;
 import vn.dangthehao.train.entity.PmhComponents1;
+import vn.dangthehao.train.enums.ComponentSortField;
 import vn.dangthehao.train.util.PageResultBuilder;
 
 import java.time.LocalDate;
@@ -44,7 +45,7 @@ public class PmhComponents1CustomRepositoryImpl implements PmhComponents1CustomR
 
   @Override
   public PageResult<PmhComponents1> findAllUseProcedure(SearchPmhComponentRequest searchRequest) {
-    final String PROCEDURE_NAME = "SEARCH_COMPONENTS_1";
+    final String PROCEDURE_NAME = "SEARCH_COMPONENTS_1_SORTING";
     StoredProcedureQuery query =
         entityManager.createStoredProcedureQuery(PROCEDURE_NAME, PmhComponents1.class);
 
@@ -61,6 +62,13 @@ public class PmhComponents1CustomRepositoryImpl implements PmhComponents1CustomR
 
   private static boolean isNotNull(Object value) {
     return value != null;
+  }
+
+  private void setOrderClause(StringBuilder sql, SearchPmhComponentRequest searchRequest) {
+    sql.append(" ORDER BY ");
+    sql.append(searchRequest.getSortFieldOrDefault().dbColumn()).append(", ");
+    sql.append(ComponentSortField.ID.dbColumn()).append(" ");
+    sql.append(searchRequest.getSortDirectionOrDefault());
   }
 
   private void buildSql(
@@ -126,7 +134,7 @@ public class PmhComponents1CustomRepositoryImpl implements PmhComponents1CustomR
       parameters.put("endEffectiveDateTo", searchRequest.getEndEffectiveDateTo());
     }
 
-    sql.append(" ORDER BY ID");
+    setOrderClause(sql, searchRequest);
   }
 
   private <T> Query buildNativeQuery(
@@ -173,6 +181,8 @@ public class PmhComponents1CustomRepositoryImpl implements PmhComponents1CustomR
     String pEndEffectiveDateTo = "p_end_effective_date_to";
     String pPage = "p_page";
     String pSize = "p_size";
+    String pOrderBy = "p_order_by";
+    String pSortDirection = "p_order_direction";
 
     // Register INPUT
     query.registerStoredProcedureParameter(pComponentCode, String.class, ParameterMode.IN);
@@ -190,6 +200,8 @@ public class PmhComponents1CustomRepositoryImpl implements PmhComponents1CustomR
     query.registerStoredProcedureParameter(pEndEffectiveDateTo, LocalDate.class, ParameterMode.IN);
     query.registerStoredProcedureParameter(pPage, Integer.class, ParameterMode.IN);
     query.registerStoredProcedureParameter(pSize, Integer.class, ParameterMode.IN);
+    query.registerStoredProcedureParameter(pOrderBy, String.class, ParameterMode.IN);
+    query.registerStoredProcedureParameter(pSortDirection, String.class, ParameterMode.IN);
 
     // Set value for INPUT
     query.setParameter(pComponentCode, searchRequest.getComponentCode());
@@ -206,6 +218,8 @@ public class PmhComponents1CustomRepositoryImpl implements PmhComponents1CustomR
     query.setParameter(pEndEffectiveDateTo, searchRequest.getEndEffectiveDateTo());
     query.setParameter(pPage, searchRequest.getPageOrDefault());
     query.setParameter(pSize, searchRequest.getSizeOrDefault());
+    query.setParameter(pOrderBy, searchRequest.getSortFieldOrDefault().dbColumn());
+    query.setParameter(pSortDirection, searchRequest.getSortDirectionOrDefault().name());
   }
 
   private void setOtParameters(StoredProcedureQuery query) {

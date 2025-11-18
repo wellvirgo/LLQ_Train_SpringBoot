@@ -49,7 +49,7 @@ public class PmhComponents1ServiceImpl implements PmhComponents1Service {
         switch (searchTech) {
           case ENTITY_MANAGER -> searchComponentFactory.getSearchService(EntityManagerSearch.class);
           case PROCEDURE -> searchComponentFactory.getSearchService(ProcedureSearch.class);
-          default -> searchComponentFactory.getSearchService(JpaSpecificationSearch.class);
+          default -> searchComponentFactory.getSearchService(JpaSpecificationSearchDynamicSort.class);
         };
 
     PageResult<PmhComponents1> pageResult = searchService.search(request);
