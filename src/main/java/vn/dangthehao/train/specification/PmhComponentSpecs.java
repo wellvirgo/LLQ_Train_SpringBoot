@@ -30,23 +30,23 @@ public class PmhComponentSpecs {
       List<Predicate> predicates = new ArrayList<>();
 
       if (isNotNullOrBlank(componentCode)) {
-        predicates.add(equal(root, cb, "componentCode", componentCode));
+        predicates.add(equal(root, cb, "componentCode", componentCode.toLowerCase().trim()));
       }
 
       if (isNotNullOrBlank(componentName)) {
-        predicates.add(like(root, cb, "componentName", componentName));
+        predicates.add(like(root, cb, "componentName", componentName.toLowerCase().trim()));
       }
 
       if (isNotNullOrBlank(messageType)) {
-        predicates.add(like(root, cb, "messageType", messageType));
+        predicates.add(like(root, cb, "messageType", messageType.toLowerCase().trim()));
       }
 
       if (isNotNullOrBlank(connectionMethod)) {
-        predicates.add(like(root, cb, "connectionMethod", connectionMethod));
+        predicates.add(like(root, cb, "connectionMethod", connectionMethod.toLowerCase().trim()));
       }
 
       if (isNotNullOrBlank(checkToken)) {
-        predicates.add(equal(root, cb, "checkToken", checkToken));
+        predicates.add(equal(root, cb, "checkToken", checkToken.toLowerCase().trim()));
       }
 
       if (isNotNull(isDisplay)) {

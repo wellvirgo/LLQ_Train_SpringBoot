@@ -37,7 +37,7 @@ public class PmhComponents1CustomRepositoryImpl implements PmhComponents1CustomR
   @Override
   public long count(SearchPmhComponentRequest searchRequest) {
     StringBuilder sql =
-        new StringBuilder("SELECT COUNT(ID) FROM PMH_COMPONENTS_1").append(WHERE_CLAUSE);
+        new StringBuilder("SELECT COUNT(*) FROM PMH_COMPONENTS_1").append(WHERE_CLAUSE);
     Query query = buildNativeQuery(Long.class, searchRequest, sql);
 
     return (Long) query.getSingleResult();
@@ -56,6 +56,7 @@ public class PmhComponents1CustomRepositoryImpl implements PmhComponents1CustomR
     return getPageResult(query);
   }
 
+  /* Helper method for Entity Manager and Native Query */
   private static boolean isNotNullOrBlank(String value) {
     return value != null && !value.isBlank();
   }
@@ -75,28 +76,28 @@ public class PmhComponents1CustomRepositoryImpl implements PmhComponents1CustomR
       SearchPmhComponentRequest searchRequest, StringBuilder sql, Map<String, Object> parameters) {
     if (isNotNullOrBlank(searchRequest.getComponentCode())) {
       sql.append(" AND LOWER(COMPONENT_CODE) = :componentCode");
-      parameters.put("componentCode", searchRequest.getComponentCode().toLowerCase());
+      parameters.put("componentCode", searchRequest.getComponentCode().toLowerCase().trim());
     }
 
     if (isNotNullOrBlank(searchRequest.getComponentName())) {
       sql.append(" AND LOWER(COMPONENT_NAME) like :componentName");
-      parameters.put("componentName", "%" + searchRequest.getComponentName().toLowerCase() + "%");
+      parameters.put("componentName", "%" + searchRequest.getComponentName().toLowerCase().trim() + "%");
     }
 
     if (isNotNullOrBlank(searchRequest.getMessageType())) {
       sql.append(" AND LOWER(MESSAGE_TYPE) like :messageType");
-      parameters.put("messageType", "%" + searchRequest.getMessageType().toLowerCase() + "%");
+      parameters.put("messageType", "%" + searchRequest.getMessageType().toLowerCase().trim() + "%");
     }
 
     if (isNotNullOrBlank(searchRequest.getConnectionMethod())) {
       sql.append(" AND LOWER(CONNECTION_METHOD) like :connectionMethod");
       parameters.put(
-          "connectionMethod", "%" + searchRequest.getConnectionMethod().toLowerCase() + "%");
+          "connectionMethod", "%" + searchRequest.getConnectionMethod().toLowerCase().trim() + "%");
     }
 
     if (isNotNullOrBlank(searchRequest.getCheckToken())) {
       sql.append(" AND LOWER(CHECK_TOKEN) = :checkToken");
-      parameters.put("checkToken", searchRequest.getCheckToken().toLowerCase());
+      parameters.put("checkToken", searchRequest.getCheckToken().toLowerCase().trim());
     }
 
     if (isNotNull(searchRequest.getIsDisplay())) {
@@ -165,6 +166,7 @@ public class PmhComponents1CustomRepositoryImpl implements PmhComponents1CustomR
         resultList, requestedPage, resultList.size(), totalElements, totalPages);
   }
 
+  /* Helper method for Stored Procedure */
   private void setInParameters(
       StoredProcedureQuery query, SearchPmhComponentRequest searchRequest) {
     String pComponentCode = "p_component_code";

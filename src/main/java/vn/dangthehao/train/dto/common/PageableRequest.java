@@ -37,8 +37,9 @@ public class PageableRequest {
   }
 
   public ComponentSortField getSortFieldOrDefault() {
+    // default sort by ID
     if (sortField != null) return sortField;
-    return ComponentSortField.ID; // default sort by ID
+    return ComponentSortField.ID;
   }
 
   public Sort.Direction getSortDirectionOrDefault() {
