@@ -49,7 +49,8 @@ public class PmhComponents1ServiceImpl implements PmhComponents1Service {
         switch (searchTech) {
           case ENTITY_MANAGER -> searchComponentFactory.getSearchService(EntityManagerSearch.class);
           case PROCEDURE -> searchComponentFactory.getSearchService(ProcedureSearch.class);
-          default -> searchComponentFactory.getSearchService(JpaSpecificationSearchDynamicSort.class);
+          default ->
+              searchComponentFactory.getSearchService(JpaSpecificationSearchDynamicSort.class);
         };
 
     PageResult<PmhComponents1> pageResult = searchService.search(request);
@@ -100,6 +101,11 @@ public class PmhComponents1ServiceImpl implements PmhComponents1Service {
   @Override
   public void deleteComponentById(Long id) {
     pmhComponents1Repository.deleteById(id);
+  }
+
+  @Override
+  public DetailPmhComponentResponse getComponentById(Long id) {
+    return pmhComponentMapper.toDetailComponentResponse(getById((id)));
   }
 
   public PmhComponents1 getById(Long id) {

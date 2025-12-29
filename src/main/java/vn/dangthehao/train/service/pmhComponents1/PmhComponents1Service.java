@@ -3,6 +3,7 @@ package vn.dangthehao.train.service.pmhComponents1;
 import vn.dangthehao.train.dto.component.request.CreatePmhComponentRequest;
 import vn.dangthehao.train.dto.component.request.SearchPmhComponentRequest;
 import vn.dangthehao.train.dto.component.request.UpdatePmhComponentRequest;
+import vn.dangthehao.train.dto.component.response.DetailPmhComponentResponse;
 import vn.dangthehao.train.dto.component.response.PmhComponentResponse;
 import vn.dangthehao.train.dto.component.response.SearchPmhComponentResponse;
 
@@ -14,4 +15,6 @@ public interface PmhComponents1Service {
   PmhComponentResponse updateComponent(Long id, UpdatePmhComponentRequest request);
 
   void deleteComponentById(Long id);
+
+  DetailPmhComponentResponse getComponentById(Long id);
 }

@@ -31,7 +31,6 @@ public class JpaSpecificationSearchDynamicSort implements SearchComponentService
     Page<PmhComponents1> pageResult =
         pmhComponents1Repository.findAll(PmhComponentSpecs.buildSpec(request), pageable);
 
-
     return PageResultBuilder.build(
         pageResult.getContent(),
         request.getPageOrDefault(),

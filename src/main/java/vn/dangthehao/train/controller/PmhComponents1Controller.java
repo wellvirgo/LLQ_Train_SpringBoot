@@ -11,6 +11,7 @@ import vn.dangthehao.train.dto.component.request.CreatePmhComponentRequest;
 import vn.dangthehao.train.dto.component.request.SearchPmhComponentRequest;
 import vn.dangthehao.train.dto.common.ApiResponse;
 import vn.dangthehao.train.dto.component.request.UpdatePmhComponentRequest;
+import vn.dangthehao.train.dto.component.response.DetailPmhComponentResponse;
 import vn.dangthehao.train.dto.component.response.PmhComponentResponse;
 import vn.dangthehao.train.dto.component.response.SearchPmhComponentResponse;
 import vn.dangthehao.train.service.pmhComponents1.PmhComponents1Service;
@@ -58,6 +59,13 @@ public class PmhComponents1Controller {
   public ResponseEntity<ApiResponse<Void>> deleteComponentById(@PathVariable(name = "id") Long id) {
     pmhComponents1Service.deleteComponentById(id);
     return ResponseEntity.ok(ApiResponseBuilder.success());
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<ApiResponse<DetailPmhComponentResponse>> getById(
+      @PathVariable(name = "id") Long id) {
+    return ResponseEntity.ok(
+        ApiResponseBuilder.success(pmhComponents1Service.getComponentById(id)));
   }
 
   private URI getComponentUri(Long id) {
