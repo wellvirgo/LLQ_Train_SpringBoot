@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository;
 import vn.dangthehao.train.entity.AppUsersRole;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface UserRoleRepository extends JpaRepository<AppUsersRole, Long> {

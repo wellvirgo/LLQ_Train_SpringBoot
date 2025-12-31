@@ -3,6 +3,8 @@ package vn.dangthehao.train.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
+
+import java.io.Serial;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +14,7 @@ import org.hibernate.Hibernate;
 @Setter
 @Embeddable
 public class AppUsersRoleId implements java.io.Serializable {
+  @Serial
   private static final long serialVersionUID = -6384871337580641251L;
 
   @NotNull
