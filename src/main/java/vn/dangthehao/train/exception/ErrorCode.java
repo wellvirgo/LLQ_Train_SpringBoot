@@ -12,6 +12,9 @@ public enum ErrorCode {
   RESOURCE_NOT_FOUND("51", ErrCodeMessage.RESOURCE_NOT_FOUND.value(), HttpStatus.NOT_FOUND),
   INVALID_ENUM_VALUE("52", ErrCodeMessage.INVALID_ENUM_VALUE.value(), HttpStatus.BAD_REQUEST),
   NOT_SUPPORTED("53", ErrCodeMessage.NOT_SUPPORTED.value(), HttpStatus.BAD_REQUEST),
+  INVALID_CREDENTIALS("54", ErrCodeMessage.INVALID_CREDENTIALS.value(), HttpStatus.BAD_REQUEST),
+  UNAUTHENTICATED("55",ErrCodeMessage.INVALID_TOKEN.value(), HttpStatus.UNAUTHORIZED),
+  FORBIDDEN("56", ErrCodeMessage.FORBIDDEN.value(), HttpStatus.FORBIDDEN),
   ;
 
   final String code;

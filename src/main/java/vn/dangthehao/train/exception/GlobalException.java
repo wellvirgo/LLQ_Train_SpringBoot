@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -62,6 +63,14 @@ public class GlobalException {
     // General res for other exception
     return ResponseEntity.status(errorCode.getHttpStatus())
         .body(ApiResponseBuilder.error(errorCode.getCode(), errorCode.getMessage(), null));
+  }
+
+  @ExceptionHandler(BadCredentialsException.class)
+  public ResponseEntity<ApiResponse<Void>> handle(BadCredentialsException ex) {
+    ErrorCode errorCode = ErrorCode.INVALID_CREDENTIALS;
+    ApiResponse<Void> apiResponse =
+        ApiResponseBuilder.error(errorCode.getCode(), errorCode.getMessage(), null);
+    return ResponseEntity.status(errorCode.getHttpStatus()).body(apiResponse);
   }
 
   private List<ErrorDetail> extractMethodArgumentErrors(MethodArgumentNotValidException ex) {

@@ -45,7 +45,7 @@ public class PmhComponents1CustomRepositoryImpl implements PmhComponents1CustomR
 
   @Override
   public PageResult<PmhComponents1> findAllUseProcedure(SearchPmhComponentRequest searchRequest) {
-    final String PROCEDURE_NAME = "SEARCH_COMPONENTS_1_SORTING";
+    final String PROCEDURE_NAME = "SEARCH_COMPONENTS_1";
     StoredProcedureQuery query =
         entityManager.createStoredProcedureQuery(PROCEDURE_NAME, PmhComponents1.class);
 

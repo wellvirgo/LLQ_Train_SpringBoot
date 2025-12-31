@@ -9,6 +9,9 @@ public enum ErrCodeMessage {
   FAILED_VALIDATION("Failed validation"),
   INVALID_ENUM_VALUE("Invalid enum value: '%s' for %s"),
   NOT_SUPPORTED("Not supported for: %s"),
+  INVALID_CREDENTIALS("Username or password is incorrect"),
+  INVALID_TOKEN("Invalid token"),
+  FORBIDDEN("Access is denied"),
   ;
 
   String value;

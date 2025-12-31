@@ -20,3 +20,16 @@ spring:
       enabled: true
     livereload:
       enabled: true
+
+logging:
+  level:
+    org:
+      springframework:
+        security: TRACE
+
+rsa:
+  private-key: ${RSA_PRIVATE_KEY}
+  public-key: ${RSA_PUBLIC_KEY}
+
+jwt:
+  alive-time: 600 #seconds
