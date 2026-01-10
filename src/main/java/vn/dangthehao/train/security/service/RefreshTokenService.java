@@ -44,4 +44,13 @@ public class RefreshTokenService {
             .build();
     refreshTokenRepository.save(refreshToken);
   }
+
+  public boolean validateToken(String token) {
+    return refreshTokenRepository.existsByTokenAndIsRevokedFalseAndExpiredAtAfter(
+        token, LocalDate.now());
+  }
+
+  public void revokeRefreshToken(String token) {
+    refreshTokenRepository.updateIsRevoked(token);
+  }
 }

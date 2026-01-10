@@ -6,10 +6,14 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vn.dangthehao.train.dto.auth.AuthRequest;
 import vn.dangthehao.train.enums.TokenKey;
+import vn.dangthehao.train.exception.AppException;
+import vn.dangthehao.train.exception.ErrorCode;
 
 import java.util.Map;
 
@@ -19,6 +23,7 @@ import java.util.Map;
 public class AuthService {
   TokenService tokenService;
   RefreshTokenService refreshTokenService;
+  UserDetailsService userDetailsService;
   AuthenticationManager authenticationManager;
 
   @Transactional
@@ -35,5 +40,31 @@ public class AuthService {
 
     return Map.of(
         TokenKey.ACCESS_TOKEN.name(), accessToken, TokenKey.REFRESH_TOKEN.name(), refreshToken);
+  }
+
+  @Transactional
+  public Map<String, String> renewTokens(String refreshToken) {
+    if (!refreshTokenService.validateToken(refreshToken)) {
+      throw new AppException(ErrorCode.UNAUTHENTICATED);
+    }
+
+    String userName = tokenService.extractUsername(refreshToken);
+    UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+    Authentication authentication =
+        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+    String accessToken = tokenService.generateToken(authentication, true);
+    String newRefreshToken = tokenService.generateToken(authentication, false);
+
+    refreshTokenService.revokeRefreshToken(refreshToken);
+    refreshTokenService.saveRefreshToken(authentication, newRefreshToken);
+
+    return Map.of(
+        TokenKey.ACCESS_TOKEN.name(), accessToken, TokenKey.REFRESH_TOKEN.name(), refreshToken);
+  }
+
+  @Transactional
+  public void logout(String refreshToken) {
+    refreshTokenService.revokeRefreshToken(refreshToken);
   }
 }

@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import vn.dangthehao.train.dto.auth.AuthRequest;
 import vn.dangthehao.train.dto.auth.AuthResponse;
 import vn.dangthehao.train.dto.common.ApiResponse;
@@ -38,18 +35,48 @@ public class AuthController {
   @PostMapping
   public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody AuthRequest request) {
     Map<String, String> tokenPairs = authService.authenticate(request);
+    return getAuthResponse(tokenPairs);
+  }
+
+  @PostMapping("/refresh")
+  public ResponseEntity<ApiResponse<AuthResponse>> refresh(
+      @CookieValue(name = "REFRESH_TOKEN", required = false) String refreshToken) {
+    Map<String, String> tokenPairs = authService.renewTokens(refreshToken);
+    return getAuthResponse(tokenPairs);
+  }
+
+  @PostMapping("/logout")
+  public ResponseEntity<ApiResponse<Void>> logout(
+      @CookieValue(name = "REFRESH_TOKEN", required = false) String refreshToken) {
+    log.info("{}", refreshToken);
+    authService.logout(refreshToken);
+    ResponseCookie cookie = buildRefreshTokenCookie(TokenKey.REFRESH_TOKEN.name(), "", 0);
+
+    return ResponseEntity.ok()
+        .header(HttpHeaders.SET_COOKIE, cookie.toString())
+        .body(ApiResponseBuilder.success());
+  }
+
+  private ResponseCookie buildRefreshTokenCookie(String key, String value, long maxAge) {
+    return ResponseCookie.from(key, value)
+        .httpOnly(true)
+        .secure(false)
+        .path("/api/auth")
+        .maxAge(maxAge)
+        .sameSite("Lax")
+        .build();
+  }
+
+  private ResponseEntity<ApiResponse<AuthResponse>> getAuthResponse(
+      Map<String, String> tokenPairs) {
     AuthResponse authResponse =
         AuthResponse.builder().accessToken(tokenPairs.get(TokenKey.ACCESS_TOKEN.name())).build();
 
     ResponseCookie cookie =
-        ResponseCookie.from(
-                TokenKey.REFRESH_TOKEN.name(), tokenPairs.get(TokenKey.REFRESH_TOKEN.name()))
-            .httpOnly(true)
-            .secure(false)
-            .path("api/auth/refresh")
-            .maxAge(refreshTokenAliveTime)
-            .sameSite("Lax")
-            .build();
+        buildRefreshTokenCookie(
+            TokenKey.REFRESH_TOKEN.name(),
+            tokenPairs.get(TokenKey.REFRESH_TOKEN.name()),
+            refreshTokenAliveTime);
 
     return ResponseEntity.ok()
         .header(HttpHeaders.SET_COOKIE, cookie.toString())

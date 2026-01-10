@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 @Component
 public class TokenService {
   JwtEncoder jwtEncoder;
+  JwtDecoder jwtDecoder;
 
   @NonFinal
   @Value("${jwt.access-token-alive-time}")
@@ -45,6 +46,10 @@ public class TokenService {
             .build();
 
     return this.jwtEncoder.encode(JwtEncoderParameters.from(claimsSet)).getTokenValue();
+  }
+
+  public String extractUsername(String token){
+    return jwtDecoder.decode(token).getSubject();
   }
 
   private String extractScope(Authentication authentication) {

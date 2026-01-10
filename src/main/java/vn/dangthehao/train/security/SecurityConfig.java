@@ -2,6 +2,7 @@ package vn.dangthehao.train.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -20,6 +21,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class SecurityConfig {
   private static final int PASS_STRENGTH = 12;
+  private static final String[] PUBLIC_POST_ENDPOINTS = {
+    "/api/auth", "/api/auth/refresh", "/api/pmh-components/search"
+  };
+
   private final AuthenticationEntryPoint authenticationEntryPoint;
   private final AccessDeniedHandler accessDeniedHandler;
 
@@ -47,8 +52,9 @@ public class SecurityConfig {
         .cors(Customizer.withDefaults())
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers("/api/pmh-components/search", "/api/auth")
+                auth.requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS)
                     .permitAll()
+                    //
                     .anyRequest()
                     .authenticated())
         .oauth2ResourceServer(
