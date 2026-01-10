@@ -3,7 +3,6 @@ package vn.dangthehao.train.service.pmhComponents1;
 import vn.dangthehao.train.dto.component.request.CreatePmhComponentRequest;
 import vn.dangthehao.train.dto.component.request.SearchPmhComponentRequest;
 import vn.dangthehao.train.dto.component.request.UpdatePmhComponentRequest;
-import vn.dangthehao.train.dto.component.response.DetailPmhComponentResponse;
 import vn.dangthehao.train.dto.component.response.PmhComponentResponse;
 import vn.dangthehao.train.dto.component.response.SearchPmhComponentResponse;
 import vn.dangthehao.train.entity.PmhComponents1;
