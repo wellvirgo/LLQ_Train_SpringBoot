@@ -32,4 +32,5 @@ rsa:
   public-key: ${RSA_PUBLIC_KEY}
 
 jwt:
-  alive-time: 600 #seconds
+  access-token-alive-time: 60 #seconds
+  refresh-token-alive-time: 604800 #seconds

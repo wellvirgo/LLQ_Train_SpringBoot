@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,6 +15,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Component
@@ -21,12 +23,17 @@ public class TokenService {
   JwtEncoder jwtEncoder;
 
   @NonFinal
-  @Value("${jwt.alive-time}")
-  Long aliveTime;
+  @Value("${jwt.access-token-alive-time}")
+  Long accessTokenAliveTime;
 
-  public String generateToken(Authentication authentication) {
+  @NonFinal
+  @Value("${jwt.refresh-token-alive-time}")
+  Long refreshTokenAliveTime;
+
+  public String generateToken(Authentication authentication, boolean isAccessToken) {
     String scope = extractScope(authentication);
     Instant issuedAt = Instant.now();
+    Long aliveTime = isAccessToken ? accessTokenAliveTime : refreshTokenAliveTime;
 
     JwtClaimsSet claimsSet =
         JwtClaimsSet.builder()

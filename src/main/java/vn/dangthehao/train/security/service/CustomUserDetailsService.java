@@ -14,6 +14,7 @@ import vn.dangthehao.train.entity.AppUser;
 import vn.dangthehao.train.entity.AppUsersRole;
 import vn.dangthehao.train.repository.UserRepository;
 import vn.dangthehao.train.repository.UserRoleRepository;
+import vn.dangthehao.train.security.CustomUserDetails;
 
 import java.util.Collection;
 import java.util.List;
@@ -33,11 +34,8 @@ public class CustomUserDetailsService implements UserDetailsService {
             .findByUsername(username)
             .orElseThrow(() -> new UsernameNotFoundException(username));
 
-    return User.builder()
-        .username(user.getUsername())
-        .password(user.getPassword())
-        .authorities(getAuthorities(user))
-        .build();
+    return new CustomUserDetails(
+        user.getId(), user.getUsername(), user.getPassword(), getAuthorities(user));
   }
 
   private Collection<? extends GrantedAuthority> getAuthorities(AppUser user) {

@@ -17,10 +17,9 @@ public class PmhComponents1 {
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pmh_component_seq_generator")
   @SequenceGenerator(
-          name = "pmh_component_seq_generator",
-          sequenceName = "PMH_COMPONENTS_1_SEQ",
-          allocationSize = 1
-  )
+      name = "pmh_component_seq_generator",
+      sequenceName = "PMH_COMPONENTS_1_SEQ",
+      allocationSize = 1)
   @Column(name = "ID", nullable = false)
   private Long id;
 
