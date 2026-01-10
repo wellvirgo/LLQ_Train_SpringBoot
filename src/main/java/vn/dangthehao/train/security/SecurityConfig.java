@@ -48,9 +48,7 @@ public class SecurityConfig {
         .cors(Customizer.withDefaults())
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers(HttpMethod.POST, "/api/pmh-components")
-                    .authenticated()
-                    .requestMatchers("/api/pmh-components/search", "/api/auth")
+                auth.requestMatchers("/api/pmh-components/search", "/api/auth")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
