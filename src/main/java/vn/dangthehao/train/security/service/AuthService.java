@@ -60,7 +60,7 @@ public class AuthService {
     refreshTokenService.saveRefreshToken(authentication, newRefreshToken);
 
     return Map.of(
-        TokenKey.ACCESS_TOKEN.name(), accessToken, TokenKey.REFRESH_TOKEN.name(), refreshToken);
+        TokenKey.ACCESS_TOKEN.name(), accessToken, TokenKey.REFRESH_TOKEN.name(), newRefreshToken);
   }
 
   @Transactional
