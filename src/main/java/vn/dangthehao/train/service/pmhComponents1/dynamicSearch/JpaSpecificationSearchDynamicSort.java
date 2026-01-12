@@ -41,7 +41,7 @@ public class JpaSpecificationSearchDynamicSort implements SearchComponentService
 
   private Pageable getPageable(SearchPmhComponentRequest request) {
     int page = request.getPageOrDefault();
-    int size = request.getSizeOrDefault();
+    Long size = request.getSizeOrDefault();
 
     Sort sort =
         Sort.by(
@@ -49,6 +49,6 @@ public class JpaSpecificationSearchDynamicSort implements SearchComponentService
             request.getSortFieldOrDefault().entityField(),
             "id");
 
-    return PageRequest.of(page - 1, size, sort);
+    return PageRequest.of(page - 1, size.intValue(), sort);
   }
 }

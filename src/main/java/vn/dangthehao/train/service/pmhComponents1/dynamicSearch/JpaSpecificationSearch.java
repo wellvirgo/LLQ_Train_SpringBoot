@@ -29,9 +29,9 @@ public class JpaSpecificationSearch implements SearchComponentService {
   @Override
   public PageResult<PmhComponents1> search(SearchPmhComponentRequest request) {
     int page = request.getPageOrDefault();
-    int size = request.getSizeOrDefault();
+    Long size = request.getSizeOrDefault();
 
-    Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.ASC, "id"));
+    Pageable pageable = PageRequest.of(page - 1, size.intValue(), Sort.by(Sort.Direction.ASC, "id"));
 
     Page<PmhComponents1> pageResult =
         pmhComponents1Repository.findAll(PmhComponentSpecs.buildSpec(request), pageable);

@@ -1,5 +1,6 @@
 package vn.dangthehao.train.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -69,6 +70,12 @@ public class PmhComponents1Controller {
   public ResponseEntity<ApiResponse<PmhComponents1>> getById(@PathVariable(name = "id") Long id) {
     return ResponseEntity.ok(
         ApiResponseBuilder.success(pmhComponents1Service.getComponentById(id)));
+  }
+
+  @PostMapping("/export")
+  public void export(
+      HttpServletResponse response, @Valid @RequestBody SearchPmhComponentRequest request) {
+    pmhComponents1Service.exportToExcel(response, request);
   }
 
   private URI getComponentUri(Long id) {

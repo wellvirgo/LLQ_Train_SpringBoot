@@ -152,11 +152,11 @@ public class PmhComponents1CustomRepositoryImpl implements PmhComponents1CustomR
   private PageResult<PmhComponents1> getPageResult(
       Query query, SearchPmhComponentRequest searchRequest) {
     int requestedPage = searchRequest.getPageOrDefault();
-    int requestedSize = searchRequest.getSizeOrDefault();
+    Long requestedSize = searchRequest.getSizeOrDefault();
 
-    int startPos = (requestedPage - 1) * requestedSize;
-    query.setFirstResult(startPos);
-    query.setMaxResults(requestedSize);
+    long startPos =  (requestedPage - 1) * requestedSize;
+    query.setFirstResult((int) startPos);
+    query.setMaxResults(requestedSize.intValue());
     List<PmhComponents1> resultList = (List<PmhComponents1>) query.getResultList();
 
     long totalElements = count(searchRequest);

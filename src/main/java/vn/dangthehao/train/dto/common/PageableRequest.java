@@ -15,13 +15,13 @@ import vn.dangthehao.train.enums.SortDirection;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PageableRequest {
   static final Integer DEFAULT_PAGE_NUMBER = 1;
-  static final Integer DEFAULT_PAGE_SIZE = 20;
+  static final Long DEFAULT_PAGE_SIZE = 20L;
 
   @Min(value = 1, message = "Page number must be greater than 0")
   Integer page;
 
   @Min(value = 0, message = "Page size must be at least 0")
-  Integer size;
+  Long size;
 
   ComponentSortField sortField;
   SortDirection sortDirection;
@@ -31,7 +31,7 @@ public class PageableRequest {
     return this.getPage();
   }
 
-  public Integer getSizeOrDefault() {
+  public Long getSizeOrDefault() {
     if (this.getSize() == null) return DEFAULT_PAGE_SIZE;
     return this.getSize();
   }
