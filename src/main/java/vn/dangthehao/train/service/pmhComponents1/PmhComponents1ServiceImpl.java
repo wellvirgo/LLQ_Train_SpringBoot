@@ -2,6 +2,7 @@ package vn.dangthehao.train.service.pmhComponents1;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ import vn.dangthehao.train.exception.AppException;
 import vn.dangthehao.train.exception.ErrorCode;
 import vn.dangthehao.train.mapper.PmhComponentMapper;
 import vn.dangthehao.train.repository.PmhComponents1Repository;
-import vn.dangthehao.train.service.export.ExcelExportComponentService;
+import vn.dangthehao.train.service.export.ExportExcelService;
 import vn.dangthehao.train.service.pmhComponents1.dynamicSearch.*;
 import vn.dangthehao.train.util.EnumUtils;
 
@@ -43,7 +44,8 @@ public class PmhComponents1ServiceImpl implements PmhComponents1Service {
   PmhComponentMapper pmhComponentMapper;
   ObjectMapper objectMapper;
   SearchComponentFactory searchComponentFactory;
-  ExcelExportComponentService excelExportComponentService;
+  ExportExcelService exportExcelService;
+  EntityManager entityManager;
 
   @Override
   public SearchPmhComponentResponse searchComponent(SearchPmhComponentRequest request) {
@@ -119,7 +121,13 @@ public class PmhComponents1ServiceImpl implements PmhComponents1Service {
     request.setSize(totalElements);
 
     List<PmhComponents1> components = searchService.search(request).getData();
-    excelExportComponentService.export(response, components);
+    exportExcelService.exportComponents(response, components);
+  }
+
+  @Override
+  public void batchCreateComponents(List<PmhComponents1> pmhComponents1) {
+    pmhComponents1Repository.saveAllAndFlush(pmhComponents1);
+    entityManager.clear();
   }
 
   public PmhComponents1 getById(Long id) {

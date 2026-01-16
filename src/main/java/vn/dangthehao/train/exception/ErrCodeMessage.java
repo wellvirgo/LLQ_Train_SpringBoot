@@ -12,6 +12,8 @@ public enum ErrCodeMessage {
   INVALID_CREDENTIALS("Username or password is incorrect"),
   INVALID_TOKEN("Invalid token"),
   FORBIDDEN("Access is denied"),
+  MAXIMUM_FILE_SIZE_EXCEEDED("Maximum file size exceeded"),
+  DATE_IN_PAST("Date in the past"),
   ;
 
   String value;

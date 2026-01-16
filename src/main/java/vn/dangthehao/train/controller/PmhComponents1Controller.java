@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import vn.dangthehao.train.dto.component.request.CreatePmhComponentRequest;
 import vn.dangthehao.train.dto.component.request.SearchPmhComponentRequest;
@@ -16,9 +17,11 @@ import vn.dangthehao.train.dto.component.request.UpdatePmhComponentRequest;
 import vn.dangthehao.train.dto.component.response.PmhComponentResponse;
 import vn.dangthehao.train.dto.component.response.SearchPmhComponentResponse;
 import vn.dangthehao.train.entity.PmhComponents1;
+import vn.dangthehao.train.service.imports.ExcelImportComponentService;
 import vn.dangthehao.train.service.pmhComponents1.PmhComponents1Service;
 import vn.dangthehao.train.util.ApiResponseBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 
 @Slf4j
@@ -28,6 +31,7 @@ import java.net.URI;
 @RequestMapping("/api/pmh-components")
 public class PmhComponents1Controller {
   PmhComponents1Service pmhComponents1Service;
+  ExcelImportComponentService excelImportComponentService;
 
   @PostMapping("/search")
   public ResponseEntity<ApiResponse<SearchPmhComponentResponse>> searchComponent(
@@ -76,6 +80,12 @@ public class PmhComponents1Controller {
   public void export(
       HttpServletResponse response, @Valid @RequestBody SearchPmhComponentRequest request) {
     pmhComponents1Service.exportToExcel(response, request);
+  }
+
+  @PostMapping("/import")
+  public void importComponents(
+      HttpServletResponse response, @RequestPart(name = "excel") MultipartFile file) {
+    excelImportComponentService.importComponents(response, file);
   }
 
   private URI getComponentUri(Long id) {

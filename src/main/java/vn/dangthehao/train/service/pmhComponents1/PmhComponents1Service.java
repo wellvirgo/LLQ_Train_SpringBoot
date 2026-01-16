@@ -8,6 +8,8 @@ import vn.dangthehao.train.dto.component.response.PmhComponentResponse;
 import vn.dangthehao.train.dto.component.response.SearchPmhComponentResponse;
 import vn.dangthehao.train.entity.PmhComponents1;
 
+import java.util.List;
+
 public interface PmhComponents1Service {
   SearchPmhComponentResponse searchComponent(SearchPmhComponentRequest request);
 
@@ -20,4 +22,6 @@ public interface PmhComponents1Service {
   PmhComponents1 getComponentById(Long id);
 
   void exportToExcel(HttpServletResponse response, SearchPmhComponentRequest request);
+
+  void batchCreateComponents(List<PmhComponents1> pmhComponents1);
 }

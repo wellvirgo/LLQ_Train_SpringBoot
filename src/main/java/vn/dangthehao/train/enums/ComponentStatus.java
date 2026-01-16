@@ -24,6 +24,10 @@ public enum ComponentStatus implements ValueEnum<Long> {
       Arrays.stream(ComponentStatus.values())
           .collect(Collectors.toMap(ComponentStatus::getValue, ComponentStatus::getLabel));
 
+  static final Map<String, Long> VALUE_MAP =
+      Arrays.stream(ComponentStatus.values())
+          .collect(Collectors.toMap(ComponentStatus::getLabel, ComponentStatus::getValue));
+
   ComponentStatus(int value, String label) {
     this.value = value;
     this.label = label;
@@ -36,5 +40,9 @@ public enum ComponentStatus implements ValueEnum<Long> {
 
   public static String getLabelByValue(long value) {
     return LABEL_MAP.get(value);
+  }
+
+  public static Long getValueByLabel(String label) {
+    return VALUE_MAP.get(label);
   }
 }

@@ -3,6 +3,7 @@ package vn.dangthehao.train.exception;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -10,6 +11,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import vn.dangthehao.train.dto.common.ApiResponse;
 import vn.dangthehao.train.dto.common.ErrorDetail;
 import vn.dangthehao.train.util.ApiResponseBuilder;
@@ -71,6 +73,13 @@ public class GlobalException {
     ApiResponse<Void> apiResponse =
         ApiResponseBuilder.error(errorCode.getCode(), errorCode.getMessage(), null);
     return ResponseEntity.status(errorCode.getHttpStatus()).body(apiResponse);
+  }
+
+  @ExceptionHandler(MaxUploadSizeExceededException.class)
+  public ResponseEntity<ApiResponse<Void>> handle(MaxUploadSizeExceededException ex) {
+    ErrorCode errorCode = ErrorCode.MAXIMUM_UPLOAD_SIZE;
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body(ApiResponseBuilder.error(errorCode.getCode(), errorCode.getMessage(), null));
   }
 
   private List<ErrorDetail> extractMethodArgumentErrors(MethodArgumentNotValidException ex) {

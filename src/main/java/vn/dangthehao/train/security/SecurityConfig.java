@@ -22,7 +22,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
   private static final int PASS_STRENGTH = 12;
   private static final String[] PUBLIC_POST_ENDPOINTS = {
-    "/api/auth", "/api/auth/refresh", "/api/pmh-components/search"
+    "/api/auth", "/api/auth/refresh", "/api/pmh-components/search", "/api/pmh-components/import",
   };
 
   private final AuthenticationEntryPoint authenticationEntryPoint;
