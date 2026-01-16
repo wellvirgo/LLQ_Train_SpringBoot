@@ -9,8 +9,8 @@ import java.time.LocalDate;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RowContext {
-  CellStyle dateCellStyle;
-  CellStyle errorCellStyle;
+  final CellStyle dateCellStyle;
+  final CellStyle errorCellStyle;
   @Setter Row currentRow;
   int cellNum;
 
