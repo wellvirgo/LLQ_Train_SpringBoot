@@ -14,6 +14,9 @@ public enum ErrCodeMessage {
   FORBIDDEN("Access is denied"),
   MAXIMUM_FILE_SIZE_EXCEEDED("Maximum file size exceeded"),
   DATE_IN_PAST("Date in the past"),
+  UNABLE_CREATE_DIRECTORY("Unable to create directory: %s"),
+  UNABLE_CREATE_FILE("Unable to create file: %s"),
+  UNABLE_READ_FILE("Unable to read file: %s"),
   ;
 
   String value;

@@ -11,7 +11,14 @@ import vn.dangthehao.train.dto.component.FailedImportRow;
 import vn.dangthehao.train.entity.PmhComponents1;
 import vn.dangthehao.train.enums.ComponentCellHeader;
 import vn.dangthehao.train.enums.ComponentStatus;
+import vn.dangthehao.train.exception.AppException;
+import vn.dangthehao.train.exception.ErrorCode;
+import vn.dangthehao.train.util.FileUtils;
 
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -29,7 +36,7 @@ public class ComponentExportExcelServiceImpl implements ExportExcelService {
         this::fillComponentRow);
   }
 
-  public void exportFailedImport(HttpServletResponse response, List<FailedImportRow> failedRows) {
+  public Path exportFailedImport(List<FailedImportRow> failedRows) {
     ComponentCellHeader[] componentCellHeaders = ComponentCellHeader.values();
     String[] headers = new String[componentCellHeaders.length + 1];
     int i = 0;
@@ -37,9 +44,10 @@ public class ComponentExportExcelServiceImpl implements ExportExcelService {
       headers[i] = componentCellHeaders[i].value();
     }
     headers[i] = "Error Details";
-    this.export(response, "export_failed", headers, failedRows, this::fillFailedImportingRow);
+    return this.export("export_failed", headers, failedRows, this::fillFailedImportingRow);
   }
 
+  @SuppressWarnings("SameParameterValue")
   private <T> void export(
       HttpServletResponse response,
       String filenamePrefix,
@@ -47,25 +55,7 @@ public class ComponentExportExcelServiceImpl implements ExportExcelService {
       List<T> data,
       BiConsumer<RowContext, T> rowFill) {
     try (Workbook workbook = new XSSFWorkbook()) {
-      Sheet sheet = workbook.createSheet("Sheet1");
-
-      CellStyle headerStyle = createHeaderStyle(workbook);
-      CellStyle dateStyle = createDateStyle(workbook);
-      CellStyle errorStyle = createErrorStyle(workbook);
-
-      if (headers instanceof ComponentCellHeader[]) {
-        createHeaderRow(sheet, headerStyle, (ComponentCellHeader[]) headers);
-      } else {
-        createHeaderRow(sheet, headerStyle, (String[]) headers);
-      }
-
-      RowContext context = new RowContext(dateStyle, errorStyle);
-      int rowIndex = 1;
-      for (T item : data) {
-        context.setCurrentRow(sheet.createRow(rowIndex++));
-        context.resetCellNum();
-        rowFill.accept(context, item);
-      }
+      createFileContent(workbook, headers, data, rowFill);
 
       String filename = filenamePrefix + "_" + System.currentTimeMillis() + ".xlsx";
       response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -74,6 +64,48 @@ public class ComponentExportExcelServiceImpl implements ExportExcelService {
       workbook.write(response.getOutputStream());
     } catch (Exception e) {
       log.info(e.getMessage());
+    }
+  }
+
+  @SuppressWarnings("SameParameterValue")
+  private <T> Path export(
+      String prefix, Object headers, List<T> data, BiConsumer<RowContext, T> rowFill) {
+    final String targetDir = "excel";
+    final String extension = ".xlsx";
+    try (Workbook workbook = new XSSFWorkbook()) {
+      createFileContent(workbook, headers, data, rowFill);
+      Path tempFile = FileUtils.createTempFile(prefix, extension, targetDir);
+
+      try (BufferedOutputStream bos = new BufferedOutputStream(Files.newOutputStream(tempFile))) {
+        workbook.write(bos);
+      }
+      return tempFile;
+    } catch (IOException e) {
+      log.info(e.getMessage());
+      throw new AppException(ErrorCode.UNABLE_CREATE_FILE, e.getMessage());
+    }
+  }
+
+  private <T> void createFileContent(
+      Workbook workbook, Object headers, List<T> data, BiConsumer<RowContext, T> rowFill) {
+    Sheet sheet = workbook.createSheet("Sheet1");
+
+    CellStyle headerStyle = createHeaderStyle(workbook);
+    CellStyle dateStyle = createDateStyle(workbook);
+    CellStyle errorStyle = createErrorStyle(workbook);
+
+    if (headers instanceof ComponentCellHeader[]) {
+      createHeaderRow(sheet, headerStyle, (ComponentCellHeader[]) headers);
+    } else {
+      createHeaderRow(sheet, headerStyle, (String[]) headers);
+    }
+
+    RowContext context = new RowContext(dateStyle, errorStyle);
+    int rowIndex = 1;
+    for (T item : data) {
+      context.setCurrentRow(sheet.createRow(rowIndex++));
+      context.resetCellNum();
+      rowFill.accept(context, item);
     }
   }
 

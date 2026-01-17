@@ -163,8 +163,7 @@ public class SheetHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
   }
 
   private boolean isInvalidCrossDate(LocalDate startDate, LocalDate endDate) {
-    if (startDate == null && endDate == null) return false;
-    if (endDate == null) return false;
+    if (startDate == null || endDate == null) return false;
     return endDate.isBefore(startDate);
   }
 

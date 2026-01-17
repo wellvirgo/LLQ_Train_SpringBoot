@@ -18,6 +18,11 @@ public enum ErrorCode {
   MAXIMUM_UPLOAD_SIZE(
       "57", ErrCodeMessage.MAXIMUM_FILE_SIZE_EXCEEDED.value(), HttpStatus.BAD_REQUEST),
   DATE_IN_PAST("58", ErrCodeMessage.DATE_IN_PAST.value(), HttpStatus.BAD_REQUEST),
+  UNABLE_CREATE_DIRECTORY(
+      "59", ErrCodeMessage.UNABLE_CREATE_DIRECTORY.value(), HttpStatus.INTERNAL_SERVER_ERROR),
+  UNABLE_CREATE_FILE(
+      "60", ErrCodeMessage.UNABLE_CREATE_FILE.value(), HttpStatus.INTERNAL_SERVER_ERROR),
+  UNABLE_READ_FILE("61", ErrCodeMessage.UNABLE_READ_FILE.value(), HttpStatus.INTERNAL_SERVER_ERROR),
   ;
 
   final String code;

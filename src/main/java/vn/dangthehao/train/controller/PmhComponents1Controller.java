@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import vn.dangthehao.train.dto.common.ImportExcelResponse;
 import vn.dangthehao.train.dto.component.request.CreatePmhComponentRequest;
 import vn.dangthehao.train.dto.component.request.SearchPmhComponentRequest;
 import vn.dangthehao.train.dto.common.ApiResponse;
@@ -82,10 +83,13 @@ public class PmhComponents1Controller {
   }
 
   @PostMapping("/import")
-  public void importComponents(
-      HttpServletResponse response, @RequestPart(name = "excel") MultipartFile file) {
-    excelImportComponentService.importComponents(response, file);
+  public ResponseEntity<ApiResponse<ImportExcelResponse>> importComponents(
+      @RequestPart(name = "excel") MultipartFile file) {
+    ImportExcelResponse response = excelImportComponentService.importComponents(file);
+    return ResponseEntity.ok(ApiResponseBuilder.success(response));
   }
+
+  @GetMapping("")
 
   private URI getComponentUri(Long id) {
     return ServletUriComponentsBuilder.fromCurrentRequest()
