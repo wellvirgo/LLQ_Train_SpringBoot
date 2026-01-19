@@ -15,14 +15,16 @@ import vn.dangthehao.train.dto.component.request.CreatePmhComponentRequest;
 import vn.dangthehao.train.dto.component.request.SearchPmhComponentRequest;
 import vn.dangthehao.train.dto.common.ApiResponse;
 import vn.dangthehao.train.dto.component.request.UpdatePmhComponentRequest;
+import vn.dangthehao.train.dto.component.response.ComponentStatusResponse;
+import vn.dangthehao.train.dto.component.response.FullDetailComponentResponse;
 import vn.dangthehao.train.dto.component.response.PmhComponentResponse;
 import vn.dangthehao.train.dto.component.response.SearchPmhComponentResponse;
-import vn.dangthehao.train.entity.PmhComponents1;
 import vn.dangthehao.train.service.imports.ExcelImportComponentService;
 import vn.dangthehao.train.service.pmhComponents1.PmhComponents1Service;
 import vn.dangthehao.train.util.ApiResponseBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -71,7 +73,8 @@ public class PmhComponents1Controller {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<ApiResponse<PmhComponents1>> getById(@PathVariable(name = "id") Long id) {
+  public ResponseEntity<ApiResponse<FullDetailComponentResponse>> getById(
+      @PathVariable(name = "id") Long id) {
     return ResponseEntity.ok(
         ApiResponseBuilder.success(pmhComponents1Service.getComponentById(id)));
   }
@@ -89,7 +92,12 @@ public class PmhComponents1Controller {
     return ResponseEntity.ok(ApiResponseBuilder.success(response));
   }
 
-  @GetMapping("")
+  @GetMapping("statuses")
+  public ResponseEntity<ApiResponse<List<ComponentStatusResponse>>> getAllStatuses() {
+    ApiResponse<List<ComponentStatusResponse>> response =
+        ApiResponseBuilder.success(pmhComponents1Service.getAllStatuses());
+    return ResponseEntity.ok(response);
+  }
 
   private URI getComponentUri(Long id) {
     return ServletUriComponentsBuilder.fromCurrentRequest()

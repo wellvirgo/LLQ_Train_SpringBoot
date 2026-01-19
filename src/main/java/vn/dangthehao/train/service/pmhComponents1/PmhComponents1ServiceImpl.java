@@ -16,9 +16,7 @@ import vn.dangthehao.train.dto.component.request.CreatePmhComponentRequest;
 import vn.dangthehao.train.dto.component.request.SearchPmhComponentRequest;
 import vn.dangthehao.train.dto.component.NewDataComponent;
 import vn.dangthehao.train.dto.component.request.UpdatePmhComponentRequest;
-import vn.dangthehao.train.dto.component.response.DetailPmhComponentResponse;
-import vn.dangthehao.train.dto.component.response.PmhComponentResponse;
-import vn.dangthehao.train.dto.component.response.SearchPmhComponentResponse;
+import vn.dangthehao.train.dto.component.response.*;
 import vn.dangthehao.train.entity.PmhComponents1;
 import vn.dangthehao.train.enums.ComponentActive;
 import vn.dangthehao.train.enums.ComponentDisplay;
@@ -32,6 +30,7 @@ import vn.dangthehao.train.service.export.ExportExcelService;
 import vn.dangthehao.train.service.pmhComponents1.dynamicSearch.*;
 import vn.dangthehao.train.util.EnumUtils;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -109,8 +108,18 @@ public class PmhComponents1ServiceImpl implements PmhComponents1Service {
   }
 
   @Override
-  public PmhComponents1 getComponentById(Long id) {
-    return getById(id);
+  public FullDetailComponentResponse getComponentById(Long id) {
+    PmhComponents1 component = getById(id);
+    FullDetailComponentResponse detailComponent =
+        pmhComponentMapper.toFullDetailComponentResponse(component);
+
+    ComponentStatusResponse statusDetail =
+        ComponentStatusResponse.builder()
+            .label(ComponentStatus.getLabelByValue(component.getStatus()))
+            .value(component.getStatus())
+            .build();
+    detailComponent.setStatusDetail(statusDetail);
+    return detailComponent;
   }
 
   @Override
@@ -128,6 +137,15 @@ public class PmhComponents1ServiceImpl implements PmhComponents1Service {
   public void batchCreateComponents(List<PmhComponents1> pmhComponents1) {
     pmhComponents1Repository.saveAllAndFlush(pmhComponents1);
     entityManager.clear();
+  }
+
+  @Override
+  public List<ComponentStatusResponse> getAllStatuses() {
+    return Arrays.stream(ComponentStatus.values())
+        .map(
+            ct ->
+                ComponentStatusResponse.builder().value(ct.getValue()).label(ct.getLabel()).build())
+        .toList();
   }
 
   public PmhComponents1 getById(Long id) {

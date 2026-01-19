@@ -3,6 +3,7 @@ package vn.dangthehao.train.mapper;
 import org.mapstruct.*;
 import vn.dangthehao.train.dto.component.request.CreatePmhComponentRequest;
 import vn.dangthehao.train.dto.component.request.UpdatePmhComponentRequest;
+import vn.dangthehao.train.dto.component.response.FullDetailComponentResponse;
 import vn.dangthehao.train.dto.component.response.PmhComponentResponse;
 import vn.dangthehao.train.dto.component.response.DetailPmhComponentResponse;
 import vn.dangthehao.train.dto.component.NewDataComponent;
@@ -24,4 +25,7 @@ public interface PmhComponentMapper {
   @Mapping(target = "status", ignore = true)
   void updateComponentFromRequest(
       UpdatePmhComponentRequest request, @MappingTarget PmhComponents1 entity);
+
+  @Mapping(target = "status", ignore = true)
+  FullDetailComponentResponse toFullDetailComponentResponse(PmhComponents1 entity);
 }

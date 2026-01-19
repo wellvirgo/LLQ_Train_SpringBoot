@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import vn.dangthehao.train.dto.component.request.CreatePmhComponentRequest;
 import vn.dangthehao.train.dto.component.request.SearchPmhComponentRequest;
 import vn.dangthehao.train.dto.component.request.UpdatePmhComponentRequest;
+import vn.dangthehao.train.dto.component.response.ComponentStatusResponse;
+import vn.dangthehao.train.dto.component.response.FullDetailComponentResponse;
 import vn.dangthehao.train.dto.component.response.PmhComponentResponse;
 import vn.dangthehao.train.dto.component.response.SearchPmhComponentResponse;
 import vn.dangthehao.train.entity.PmhComponents1;
@@ -19,9 +21,11 @@ public interface PmhComponents1Service {
 
   void deleteComponentById(Long id);
 
-  PmhComponents1 getComponentById(Long id);
+  FullDetailComponentResponse getComponentById(Long id);
 
   void exportToExcel(HttpServletResponse response, SearchPmhComponentRequest request);
 
   void batchCreateComponents(List<PmhComponents1> pmhComponents1);
+
+  List<ComponentStatusResponse> getAllStatuses();
 }
