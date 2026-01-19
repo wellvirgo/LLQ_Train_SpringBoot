@@ -5,8 +5,10 @@ import org.springframework.stereotype.Repository;
 import vn.dangthehao.train.entity.MsgTypeSummary;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
 public interface MessageTypeRepository extends JpaRepository<MsgTypeSummary, Long> {
   List<MsgTypeSummary> findByActiveStatus(Long status);
+  List<MsgTypeSummary> findByMsgTypeIn(Set<String> msgTypes);
 }

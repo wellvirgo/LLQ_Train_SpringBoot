@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import vn.dangthehao.train.dto.messageType.MsgTypeResponse;
 
 import java.time.LocalDate;
 
@@ -19,10 +20,10 @@ public class DetailPmhComponentResponse {
   Long id;
   String componentCode;
   String componentName;
-  String messageType;
+  MsgTypeResponse messageType;
   String connectionMethod;
   String checkToken;
-  Long status;
+  ComponentStatusResponse status;
   @JsonRawValue String newData;
   LocalDate effectiveDate;
   LocalDate endEffectiveDate;

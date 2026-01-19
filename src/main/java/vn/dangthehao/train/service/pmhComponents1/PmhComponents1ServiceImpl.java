@@ -11,12 +11,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import vn.dangthehao.train.dto.common.PageInfo;
 import vn.dangthehao.train.dto.common.PageResult;
 import vn.dangthehao.train.dto.component.request.CreatePmhComponentRequest;
 import vn.dangthehao.train.dto.component.request.SearchPmhComponentRequest;
 import vn.dangthehao.train.dto.component.NewDataComponent;
 import vn.dangthehao.train.dto.component.request.UpdatePmhComponentRequest;
 import vn.dangthehao.train.dto.component.response.*;
+import vn.dangthehao.train.dto.messageType.MsgTypeResponse;
 import vn.dangthehao.train.entity.PmhComponents1;
 import vn.dangthehao.train.enums.ComponentActive;
 import vn.dangthehao.train.enums.ComponentDisplay;
@@ -27,11 +29,12 @@ import vn.dangthehao.train.exception.ErrorCode;
 import vn.dangthehao.train.mapper.PmhComponentMapper;
 import vn.dangthehao.train.repository.PmhComponents1Repository;
 import vn.dangthehao.train.service.export.ExportExcelService;
+import vn.dangthehao.train.service.messageType.MessageTypeService;
 import vn.dangthehao.train.service.pmhComponents1.dynamicSearch.*;
 import vn.dangthehao.train.util.EnumUtils;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -44,6 +47,7 @@ public class PmhComponents1ServiceImpl implements PmhComponents1Service {
   ObjectMapper objectMapper;
   SearchComponentFactory searchComponentFactory;
   ExportExcelService exportExcelService;
+  MessageTypeService messageTypeService;
   EntityManager entityManager;
 
   @Override
@@ -169,15 +173,46 @@ public class PmhComponents1ServiceImpl implements PmhComponents1Service {
   }
 
   private SearchPmhComponentResponse buildSearchResponse(PageResult<PmhComponents1> pageResult) {
-    List<DetailPmhComponentResponse> componentsResponse =
-        pageResult.getData().stream().map(pmhComponentMapper::toDetailComponentResponse).toList();
+    List<PmhComponents1> components = pageResult.getData();
 
+    Set<String> uniqueMsgTypes =
+        components.stream()
+            .map(PmhComponents1::getMessageType)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+
+    Map<String, MsgTypeResponse> msgTypeMap =
+        messageTypeService.getMessageTypeMapByMsgTypes(uniqueMsgTypes);
+
+    List<DetailPmhComponentResponse> componentsResponse =
+        components.stream().map(c -> this.buildDetailResponse(c, msgTypeMap)).toList();
+
+    return buildPagedResponse(componentsResponse, pageResult.getPageInfo());
+  }
+
+  private DetailPmhComponentResponse buildDetailResponse(
+      PmhComponents1 component, Map<String, MsgTypeResponse> msgTypeResponseMap) {
+    DetailPmhComponentResponse detailResponse =
+        pmhComponentMapper.toDetailComponentResponse(component);
+
+    detailResponse.setStatus(
+        ComponentStatusResponse.builder()
+            .label(ComponentStatus.getLabelByValue(component.getStatus()))
+            .value(component.getStatus())
+            .build());
+    detailResponse.setMessageType(msgTypeResponseMap.get(component.getMessageType()));
+
+    return detailResponse;
+  }
+
+  private SearchPmhComponentResponse buildPagedResponse(
+      List<DetailPmhComponentResponse> detailPmhComponentResponses, PageInfo pageInfo) {
     return SearchPmhComponentResponse.builder()
-        .components(componentsResponse)
-        .page(pageResult.getPageInfo().getPage())
-        .size(pageResult.getPageInfo().getSize())
-        .totalElements(pageResult.getPageInfo().getTotalElements())
-        .totalPages(pageResult.getPageInfo().getTotalPages())
+        .components(detailPmhComponentResponses)
+        .page(pageInfo.getPage())
+        .size(pageInfo.getSize())
+        .totalElements(pageInfo.getTotalElements())
+        .totalPages(pageInfo.getTotalPages())
         .build();
   }
 }

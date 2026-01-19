@@ -13,6 +13,8 @@ import vn.dangthehao.train.entity.PmhComponents1;
 public interface PmhComponentMapper {
   PmhComponents1 toComponentEntity(CreatePmhComponentRequest request);
 
+  @Mapping(target = "status", ignore = true)
+  @Mapping(target = "messageType", ignore = true)
   DetailPmhComponentResponse toDetailComponentResponse(PmhComponents1 entity);
 
   NewDataComponent toNewDataComponent(PmhComponents1 entity);
