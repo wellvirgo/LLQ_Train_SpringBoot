@@ -23,6 +23,7 @@ public enum ErrorCode {
   UNABLE_CREATE_FILE(
       "60", ErrCodeMessage.UNABLE_CREATE_FILE.value(), HttpStatus.INTERNAL_SERVER_ERROR),
   UNABLE_READ_FILE("61", ErrCodeMessage.UNABLE_READ_FILE.value(), HttpStatus.INTERNAL_SERVER_ERROR),
+  INVALID_FILE_TEMPLATE("62", ErrCodeMessage.INVALID_FILE_TEMPLATE.value(), HttpStatus.BAD_REQUEST),
   ;
 
   final String code;

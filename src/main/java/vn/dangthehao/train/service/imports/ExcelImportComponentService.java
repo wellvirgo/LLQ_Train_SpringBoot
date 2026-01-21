@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.util.XMLHelper;
@@ -16,6 +17,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import vn.dangthehao.train.dto.common.ImportExcelResponse;
 import vn.dangthehao.train.entity.PmhComponents1;
@@ -26,6 +28,8 @@ import vn.dangthehao.train.service.export.ExportExcelService;
 import vn.dangthehao.train.service.pmhComponents1.PmhComponents1Service;
 import vn.dangthehao.train.util.FileUtils;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
@@ -66,7 +70,7 @@ public class ExcelImportComponentService {
             new XSSFSheetXMLHandler(stylesTable, strings, sheetHandler, formatter, false);
         parser.setContentHandler(contentHandler);
         parser.parse(new InputSource(inputStream));
-        sheetHandler.processRemaining();
+        componentService.batchCreateComponents(sheetHandler.getComponents());
 
         if (!sheetHandler.getErrors().isEmpty()) {
           Path report = exportExcelService.exportFailedImport(sheetHandler.getErrors());
@@ -78,24 +82,24 @@ public class ExcelImportComponentService {
         return buildImportResponse(ImportFileStatus.COMPLETE, null, sheetHandler);
       }
 
-    } catch (Exception e) {
+    } catch (IOException | SAXException | OpenXML4JException | ParserConfigurationException e) {
       log.info("Error when reading excel file", e);
     }
 
     return ImportExcelResponse.builder().status(ImportFileStatus.ERROR).build();
   }
 
-  public Resource loadErrorImportReport(String fileName){
-      try {
-          Path file = FileUtils.getTempFile(fileName, "excel");
-          return new UrlResource(file.toUri());
-      } catch (MalformedURLException e) {
+  public Resource loadErrorImportReport(String fileName) {
+    try {
+      Path file = FileUtils.getTempFile(fileName, "excel");
+      return new UrlResource(file.toUri());
+    } catch (MalformedURLException e) {
       throw new AppException(ErrorCode.UNABLE_READ_FILE, "Invalid path");
-      }
+    }
   }
 
   private ImportExcelResponse buildImportResponse(
-          ImportFileStatus status, String errorReportName, SheetHandler sheetHandler) {
+      ImportFileStatus status, String errorReportName, SheetHandler sheetHandler) {
     long success = sheetHandler.getComponents().size();
     long failed = sheetHandler.getErrors().size();
     long total = success + failed;

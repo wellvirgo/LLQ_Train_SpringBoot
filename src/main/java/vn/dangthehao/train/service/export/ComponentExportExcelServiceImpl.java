@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
-import vn.dangthehao.train.dto.component.FailedImportRow;
+import vn.dangthehao.train.dto.component.DraftImportRow;
 import vn.dangthehao.train.entity.PmhComponents1;
 import vn.dangthehao.train.enums.ComponentCellHeader;
 import vn.dangthehao.train.enums.ComponentStatus;
@@ -36,7 +36,7 @@ public class ComponentExportExcelServiceImpl implements ExportExcelService {
         this::fillComponentRow);
   }
 
-  public Path exportFailedImport(List<FailedImportRow> failedRows) {
+  public Path exportFailedImport(List<DraftImportRow> failedRows) {
     ComponentCellHeader[] componentCellHeaders = ComponentCellHeader.values();
     String[] headers = new String[componentCellHeaders.length + 1];
     int i = 0;
@@ -119,7 +119,7 @@ public class ComponentExportExcelServiceImpl implements ExportExcelService {
     context.createCell(ComponentStatus.getLabelByValue(component.getStatus()), null);
   }
 
-  private void fillFailedImportingRow(RowContext context, FailedImportRow failedRow) {
+  private void fillFailedImportingRow(RowContext context, DraftImportRow failedRow) {
     context.createCell(failedRow.getComponentCode(), null);
     context.createCell(failedRow.getComponentName(), null);
     context.createCell(failedRow.getEffectiveDate(), null);

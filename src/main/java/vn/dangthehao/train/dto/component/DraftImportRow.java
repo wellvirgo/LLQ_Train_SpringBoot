@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class FailedImportRow {
+public class DraftImportRow {
   String componentCode;
   String componentName;
   String effectiveDate;

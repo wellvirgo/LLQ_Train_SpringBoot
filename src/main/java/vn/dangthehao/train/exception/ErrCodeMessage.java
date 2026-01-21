@@ -17,6 +17,7 @@ public enum ErrCodeMessage {
   UNABLE_CREATE_DIRECTORY("Unable to create directory: %s"),
   UNABLE_CREATE_FILE("Unable to create file: %s"),
   UNABLE_READ_FILE("Unable to read file: %s"),
+  INVALID_FILE_TEMPLATE("Invalid file template"),
   ;
 
   String value;
