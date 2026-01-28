@@ -1,5 +1,6 @@
 package vn.dangthehao.train.security;
 
+import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -52,7 +53,10 @@ public class SecurityConfig {
         .cors(Customizer.withDefaults())
         .authorizeHttpRequests(
             auth ->
-                auth.requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS)
+                auth.dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.ERROR)
+                    .permitAll()
+                    //
+                    .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS)
                     .permitAll()
                     //
                     .anyRequest()

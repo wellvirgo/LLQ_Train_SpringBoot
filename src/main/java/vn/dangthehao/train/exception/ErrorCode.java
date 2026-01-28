@@ -24,6 +24,9 @@ public enum ErrorCode {
       "60", ErrCodeMessage.UNABLE_CREATE_FILE.value(), HttpStatus.INTERNAL_SERVER_ERROR),
   UNABLE_READ_FILE("61", ErrCodeMessage.UNABLE_READ_FILE.value(), HttpStatus.INTERNAL_SERVER_ERROR),
   INVALID_FILE_TEMPLATE("62", ErrCodeMessage.INVALID_FILE_TEMPLATE.value(), HttpStatus.BAD_REQUEST),
+  UNABLE_DELETE_FILE(
+      "63", ErrCodeMessage.UNABLE_DELETE_FILE.value(), HttpStatus.INTERNAL_SERVER_ERROR),
+  IO_ERROR("64", ErrCodeMessage.IO_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR),
   ;
 
   final String code;

@@ -18,6 +18,8 @@ public enum ErrCodeMessage {
   UNABLE_CREATE_FILE("Unable to create file: %s"),
   UNABLE_READ_FILE("Unable to read file: %s"),
   INVALID_FILE_TEMPLATE("Invalid file template"),
+  UNABLE_DELETE_FILE("Unable to delete file"),
+  IO_ERROR("Unexpected file system error"),
   ;
 
   String value;
