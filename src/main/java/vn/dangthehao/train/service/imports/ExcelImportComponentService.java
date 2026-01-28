@@ -14,7 +14,9 @@ import org.apache.poi.xssf.eventusermodel.XSSFSheetXMLHandler;
 import org.apache.poi.xssf.model.StylesTable;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -44,6 +46,7 @@ public class ExcelImportComponentService {
   PmhComponents1Service componentService;
   ExportExcelService exportExcelService;
 
+  @Transactional
   // .xlsx is the ZIP archive contains many small .xml files
   public ImportExcelResponse importComponents(MultipartFile file) {
     // OPCPackage as un-zipper and contain .xml files
@@ -96,6 +99,11 @@ public class ExcelImportComponentService {
     } catch (MalformedURLException e) {
       throw new AppException(ErrorCode.UNABLE_READ_FILE, "Invalid path");
     }
+  }
+
+  @Scheduled(cron = "0 0 0 * * ?")
+  public void clearTempErrorReport() {
+    FileUtils.deleteTempFiles(".xlsx", "excel");
   }
 
   private ImportExcelResponse buildImportResponse(

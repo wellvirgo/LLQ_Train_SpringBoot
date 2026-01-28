@@ -15,6 +15,11 @@ spring:
         format_sql: true
         highlight_sql: true
         dialect: org.hibernate.dialect.OracleDialect
+        jdbc:
+          batch_size: 100
+        order_inserts: true
+        order_updates: true
+        generate_statistics: true
   devtools:
     restart:
       enabled: true
@@ -35,5 +40,5 @@ rsa:
   public-key: ${RSA_PUBLIC_KEY}
 
 jwt:
-  access-token-alive-time: 60 #seconds
+  access-token-alive-time: 300 #seconds
   refresh-token-alive-time: 604800 #seconds
