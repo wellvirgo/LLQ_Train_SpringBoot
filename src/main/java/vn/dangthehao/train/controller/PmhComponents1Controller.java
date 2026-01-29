@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import vn.dangthehao.train.dto.common.ImportExcelResponse;
+import vn.dangthehao.train.dto.component.request.BatchingUpdateStatusRequest;
 import vn.dangthehao.train.dto.component.request.CreatePmhComponentRequest;
 import vn.dangthehao.train.dto.component.request.SearchPmhComponentRequest;
 import vn.dangthehao.train.dto.common.ApiResponse;
@@ -97,6 +98,15 @@ public class PmhComponents1Controller {
     ApiResponse<List<ComponentStatusResponse>> response =
         ApiResponseBuilder.success(pmhComponents1Service.getAllStatuses());
     return ResponseEntity.ok(response);
+  }
+
+  @PatchMapping("statuses")
+  public ResponseEntity<ApiResponse<Integer>> batchUpdateStatus(
+      @RequestBody BatchingUpdateStatusRequest request) {
+    int result =
+        pmhComponents1Service.updateComponentStatus(request.getIds(), request.getStatus());
+
+    return ResponseEntity.ok(ApiResponseBuilder.success(result));
   }
 
   private URI getComponentUri(Long id) {

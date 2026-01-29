@@ -144,6 +144,23 @@ public class PmhComponents1ServiceImpl implements PmhComponents1Service {
   }
 
   @Override
+  @Transactional
+  public int updateComponentStatus(List<Long> ids, String statusLabel) {
+    int result = 0;
+    if (ids == null || ids.isEmpty()) return result;
+
+    Long status = ComponentStatus.getValueByLabel(statusLabel);
+
+    try {
+      result = pmhComponents1Repository.updateStatusForIds(ids, status);
+    } catch (Exception e) {
+      throw new AppException(ErrorCode.DATA_BATCH_UPDATE_FAILED);
+    }
+
+    return result;
+  }
+
+  @Override
   public List<ComponentStatusResponse> getAllStatuses() {
     return Arrays.stream(ComponentStatus.values())
         .map(

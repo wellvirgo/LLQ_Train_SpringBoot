@@ -27,5 +27,7 @@ public interface PmhComponents1Service {
 
   void batchCreateComponents(List<PmhComponents1> pmhComponents1);
 
+  int updateComponentStatus(List<Long> ids, String statusLabel);
+
   List<ComponentStatusResponse> getAllStatuses();
 }

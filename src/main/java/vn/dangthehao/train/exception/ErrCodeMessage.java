@@ -20,6 +20,7 @@ public enum ErrCodeMessage {
   INVALID_FILE_TEMPLATE("Invalid file template"),
   UNABLE_DELETE_FILE("Unable to delete file"),
   IO_ERROR("Unexpected file system error"),
+  DATA_BATCH_UPDATE_FAILED("Batch update failed"),
   ;
 
   String value;
