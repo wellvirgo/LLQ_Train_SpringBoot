@@ -150,6 +150,8 @@ public class PmhComponents1ServiceImpl implements PmhComponents1Service {
     if (ids == null || ids.isEmpty()) return result;
 
     Long status = ComponentStatus.getValueByLabel(statusLabel);
+    if(Objects.isNull(status))
+      throw new AppException(ErrorCode.INVALID_ENUM_VALUE, statusLabel, ComponentStatus.class.getSimpleName());
 
     try {
       result = pmhComponents1Repository.updateStatusForIds(ids, status);
