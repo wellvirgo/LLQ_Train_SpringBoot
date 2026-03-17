@@ -19,7 +19,7 @@ spring:
           batch_size: 100
         order_inserts: true
         order_updates: true
-        generate_statistics: true
+        generate_statistics: false
   devtools:
     restart:
       enabled: true
@@ -33,12 +33,12 @@ logging:
   level:
     org:
       springframework:
-        security: TRACE
+        security: OFF
 
 rsa:
   private-key: ${RSA_PRIVATE_KEY}
   public-key: ${RSA_PUBLIC_KEY}
 
 jwt:
-  access-token-alive-time: 300 #seconds
+  access-token-alive-time: 3600 #seconds
   refresh-token-alive-time: 604800 #seconds

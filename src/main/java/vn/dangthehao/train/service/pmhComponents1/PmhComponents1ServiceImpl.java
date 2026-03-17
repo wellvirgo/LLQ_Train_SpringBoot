@@ -123,6 +123,11 @@ public class PmhComponents1ServiceImpl implements PmhComponents1Service {
             .value(component.getStatus())
             .build();
     detailComponent.setStatusDetail(statusDetail);
+
+    MsgTypeResponse msgTypeDetail =
+        messageTypeService.getMessageTypeByMsgType(component.getMessageType());
+    detailComponent.setMsgTypeDetail(msgTypeDetail);
+
     return detailComponent;
   }
 
@@ -150,8 +155,9 @@ public class PmhComponents1ServiceImpl implements PmhComponents1Service {
     if (ids == null || ids.isEmpty()) return result;
 
     Long status = ComponentStatus.getValueByLabel(statusLabel);
-    if(Objects.isNull(status))
-      throw new AppException(ErrorCode.INVALID_ENUM_VALUE, statusLabel, ComponentStatus.class.getSimpleName());
+    if (Objects.isNull(status))
+      throw new AppException(
+          ErrorCode.INVALID_ENUM_VALUE, statusLabel, ComponentStatus.class.getSimpleName());
 
     try {
       result = pmhComponents1Repository.updateStatusForIds(ids, status);

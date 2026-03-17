@@ -55,8 +55,8 @@ public class ExcelImportComponentService {
       ReadOnlySharedStringsTable strings = new ReadOnlySharedStringsTable(opcPackage);
       // XSSFReader like "Map" to navigate .xml file in OPCPackage
       XSSFReader xssfReader = new XSSFReader(opcPackage);
-      StylesTable stylesTable = xssfReader.getStylesTable();
       // Combine raw value and the rule from StyleTable to produce formatted value
+      StylesTable stylesTable = xssfReader.getStylesTable();
       DataFormatter formatter = new DataFormatter();
 
       Consumer<List<PmhComponents1>> saveCallback = componentService::batchCreateComponents;

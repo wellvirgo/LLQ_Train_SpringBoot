@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import vn.dangthehao.train.dto.messageType.MsgTypeResponse;
 import vn.dangthehao.train.entity.MsgTypeSummary;
+import vn.dangthehao.train.mapper.MsgTypeMapper;
 import vn.dangthehao.train.repository.MessageTypeRepository;
 
 import java.util.Collections;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 @Service
 public class MsgTypeServiceImpl implements MessageTypeService {
   MessageTypeRepository msgTypeRepository;
+  MsgTypeMapper msgTypeMapper;
 
   @Override
   public List<MsgTypeSummary> getMessageTypeByStatus(Long status) {
@@ -32,6 +34,12 @@ public class MsgTypeServiceImpl implements MessageTypeService {
     }
     return msgTypeRepository.findByMsgTypeIn(msgTypes).stream()
         .collect(Collectors.toMap(MsgTypeSummary::getMsgType, this::buildMsgTypeResponse));
+  }
+
+  @Override
+  public MsgTypeResponse getMessageTypeByMsgType(String msgType) {
+    MsgTypeSummary msgTypeSummary = msgTypeRepository.findByMsgType(msgType);
+    return msgTypeMapper.toMsgTypeResponse(msgTypeSummary);
   }
 
   private MsgTypeResponse buildMsgTypeResponse(MsgTypeSummary msgTypeSummary) {

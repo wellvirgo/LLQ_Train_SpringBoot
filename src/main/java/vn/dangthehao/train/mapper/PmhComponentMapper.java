@@ -29,5 +29,6 @@ public interface PmhComponentMapper {
       UpdatePmhComponentRequest request, @MappingTarget PmhComponents1 entity);
 
   @Mapping(target = "status", ignore = true)
+  @Mapping(target = "messageType", ignore = true)
   FullDetailComponentResponse toFullDetailComponentResponse(PmhComponents1 entity);
 }

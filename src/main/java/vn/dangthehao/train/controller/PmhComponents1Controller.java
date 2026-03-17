@@ -76,8 +76,13 @@ public class PmhComponents1Controller {
   @GetMapping("/{id}")
   public ResponseEntity<ApiResponse<FullDetailComponentResponse>> getById(
       @PathVariable(name = "id") Long id) {
-    return ResponseEntity.ok(
-        ApiResponseBuilder.success(pmhComponents1Service.getComponentById(id)));
+    try {
+      Thread.sleep(1000);
+      return ResponseEntity.ok(
+          ApiResponseBuilder.success(pmhComponents1Service.getComponentById(id)));
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @PostMapping("/export")
@@ -103,8 +108,7 @@ public class PmhComponents1Controller {
   @PatchMapping("statuses")
   public ResponseEntity<ApiResponse<Integer>> batchUpdateStatus(
       @RequestBody BatchingUpdateStatusRequest request) {
-    int result =
-        pmhComponents1Service.updateComponentStatus(request.getIds(), request.getStatus());
+    int result = pmhComponents1Service.updateComponentStatus(request.getIds(), request.getStatus());
 
     return ResponseEntity.ok(ApiResponseBuilder.success(result));
   }

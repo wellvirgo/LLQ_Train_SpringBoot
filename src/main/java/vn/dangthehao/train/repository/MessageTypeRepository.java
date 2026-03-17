@@ -11,4 +11,5 @@ import java.util.Set;
 public interface MessageTypeRepository extends JpaRepository<MsgTypeSummary, Long> {
   List<MsgTypeSummary> findByActiveStatus(Long status);
   List<MsgTypeSummary> findByMsgTypeIn(Set<String> msgTypes);
+  MsgTypeSummary findByMsgType(String msgType);
 }

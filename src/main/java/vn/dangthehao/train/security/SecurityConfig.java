@@ -19,6 +19,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.List;
+
 @Configuration
 public class SecurityConfig {
   private static final int PASS_STRENGTH = 12;
@@ -76,7 +78,7 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowCredentials(true);
-    configuration.addAllowedOrigin("http://localhost:4200");
+    configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:8081"));
     configuration.addAllowedHeader("*");
     configuration.addAllowedMethod("*");
 

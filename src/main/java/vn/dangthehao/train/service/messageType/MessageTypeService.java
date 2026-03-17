@@ -10,4 +10,5 @@ import java.util.Set;
 public interface MessageTypeService {
   List<MsgTypeSummary> getMessageTypeByStatus(Long status);
   Map<String, MsgTypeResponse> getMessageTypeMapByMsgTypes(Set<String> msgTypes);
+  MsgTypeResponse getMessageTypeByMsgType(String msgType);
 }
