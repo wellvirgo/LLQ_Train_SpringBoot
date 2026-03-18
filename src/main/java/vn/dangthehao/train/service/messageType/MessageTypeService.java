@@ -1,5 +1,6 @@
 package vn.dangthehao.train.service.messageType;
 
+import vn.dangthehao.train.dto.messageType.MsgTypeCreateRequest;
 import vn.dangthehao.train.dto.messageType.MsgTypeResponse;
 import vn.dangthehao.train.entity.MsgTypeSummary;
 
@@ -11,4 +12,5 @@ public interface MessageTypeService {
   List<MsgTypeSummary> getMessageTypeByStatus(Long status);
   Map<String, MsgTypeResponse> getMessageTypeMapByMsgTypes(Set<String> msgTypes);
   MsgTypeResponse getMessageTypeByMsgType(String msgType);
+  String addMultiMessageType(MsgTypeCreateRequest[] request);
 }

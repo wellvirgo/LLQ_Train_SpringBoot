@@ -6,13 +6,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 @Getter
 @Setter
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 @Table(name = "MSG_TYPE_SUMMARY")
 public class MsgTypeSummary {
   @Id
@@ -27,5 +30,6 @@ public class MsgTypeSummary {
   @NotNull
   @ColumnDefault("1")
   @Column(name = "ACTIVE_STATUS", nullable = false)
-  private Long activeStatus;
+  @Builder.Default
+  private Long activeStatus = 1L;
 }

@@ -4,11 +4,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import vn.dangthehao.train.dto.common.ApiResponse;
+import vn.dangthehao.train.dto.messageType.MsgTypeCreateRequest;
 import vn.dangthehao.train.entity.MsgTypeSummary;
 import vn.dangthehao.train.service.messageType.MessageTypeService;
 import vn.dangthehao.train.util.ApiResponseBuilder;
@@ -29,5 +27,10 @@ public class MessageTypeController {
         ApiResponseBuilder.success(msgTypeService.getMessageTypeByStatus(status));
 
     return ResponseEntity.ok(apiResponse);
+  }
+
+  @PostMapping
+  public ResponseEntity<ApiResponse<String>> addMultiMessageType(@RequestBody MsgTypeCreateRequest[] request) {
+    return ResponseEntity.ok(ApiResponseBuilder.success(msgTypeService.addMultiMessageType(request)));
   }
 }

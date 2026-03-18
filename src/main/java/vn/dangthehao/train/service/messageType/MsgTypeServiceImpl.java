@@ -4,15 +4,13 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import vn.dangthehao.train.dto.messageType.MsgTypeCreateRequest;
 import vn.dangthehao.train.dto.messageType.MsgTypeResponse;
 import vn.dangthehao.train.entity.MsgTypeSummary;
 import vn.dangthehao.train.mapper.MsgTypeMapper;
 import vn.dangthehao.train.repository.MessageTypeRepository;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -40,6 +38,16 @@ public class MsgTypeServiceImpl implements MessageTypeService {
   public MsgTypeResponse getMessageTypeByMsgType(String msgType) {
     MsgTypeSummary msgTypeSummary = msgTypeRepository.findByMsgType(msgType);
     return msgTypeMapper.toMsgTypeResponse(msgTypeSummary);
+  }
+
+  @Override
+  public String addMultiMessageType(MsgTypeCreateRequest[] request) {
+    List<MsgTypeSummary> msgTypeSummaryList = new ArrayList<>();
+    for (MsgTypeCreateRequest msgTypeCreateRequest : request) {
+      MsgTypeSummary msgTypeSummary = msgTypeMapper.toMsgTypeSummary(msgTypeCreateRequest);
+      msgTypeSummaryList.add(msgTypeSummary);
+    }
+    return msgTypeRepository.batchCreateMessageType(msgTypeSummaryList);
   }
 
   private MsgTypeResponse buildMsgTypeResponse(MsgTypeSummary msgTypeSummary) {
