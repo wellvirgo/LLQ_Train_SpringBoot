@@ -25,7 +25,11 @@ import java.util.List;
 public class SecurityConfig {
   private static final int PASS_STRENGTH = 12;
   private static final String[] PUBLIC_POST_ENDPOINTS = {
-    "/api/auth", "/api/auth/refresh", "/api/pmh-components/search", "/api/pmh-components/import",
+    "/api/auth",
+    "/api/auth/refresh",
+    "/api/pmh-components/search",
+    "/api/pmh-components/import",
+    "/api/message-types"
   };
 
   private final AuthenticationEntryPoint authenticationEntryPoint;

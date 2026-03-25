@@ -20,6 +20,7 @@ import vn.dangthehao.train.dto.component.request.UpdatePmhComponentRequest;
 import vn.dangthehao.train.dto.component.response.*;
 import vn.dangthehao.train.dto.messageType.MsgTypeResponse;
 import vn.dangthehao.train.entity.PmhComponents1;
+import vn.dangthehao.train.entity.UserActionLog;
 import vn.dangthehao.train.enums.ComponentActive;
 import vn.dangthehao.train.enums.ComponentDisplay;
 import vn.dangthehao.train.enums.ComponentStatus;
@@ -29,10 +30,12 @@ import vn.dangthehao.train.exception.ErrorCode;
 import vn.dangthehao.train.mapper.PmhComponentMapper;
 import vn.dangthehao.train.repository.PmhComponents1Repository;
 import vn.dangthehao.train.service.export.ExportExcelService;
+import vn.dangthehao.train.service.kafka.UserActionLogProcedure;
 import vn.dangthehao.train.service.messageType.MessageTypeService;
 import vn.dangthehao.train.service.pmhComponents1.dynamicSearch.*;
 import vn.dangthehao.train.util.EnumUtils;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,6 +52,7 @@ public class PmhComponents1ServiceImpl implements PmhComponents1Service {
   ExportExcelService exportExcelService;
   MessageTypeService messageTypeService;
   EntityManager entityManager;
+  UserActionLogProcedure userActionLogProcedure;
 
   @Override
   public SearchPmhComponentResponse searchComponent(SearchPmhComponentRequest request) {
@@ -84,6 +88,15 @@ public class PmhComponents1ServiceImpl implements PmhComponents1Service {
 
     PmhComponents1 savedComponent = pmhComponents1Repository.save(component);
     savedComponent.setNewData(createJsonComponent(savedComponent));
+    LocalDateTime createTime = LocalDateTime.now();
+
+    UserActionLog userActionLog =
+        UserActionLog.builder()
+            .action("CREATE")
+            .log("add a new pmh component id: " + savedComponent.getId())
+            .timestamp(createTime)
+            .build();
+    userActionLogProcedure.sendUserActionLog(userActionLog);
 
     return pmhComponentMapper.toComponentResponse(savedComponent);
   }

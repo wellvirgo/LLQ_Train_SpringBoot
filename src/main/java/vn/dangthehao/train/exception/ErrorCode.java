@@ -27,8 +27,9 @@ public enum ErrorCode {
   UNABLE_DELETE_FILE(
       "63", ErrCodeMessage.UNABLE_DELETE_FILE.value(), HttpStatus.INTERNAL_SERVER_ERROR),
   IO_ERROR("64", ErrCodeMessage.IO_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR),
-  DATA_BATCH_UPDATE_FAILED("65", ErrCodeMessage.DATA_BATCH_UPDATE_FAILED.value(), HttpStatus.INTERNAL_SERVER_ERROR),
-  ;
+  DATA_BATCH_UPDATE_FAILED(
+      "65", ErrCodeMessage.DATA_BATCH_UPDATE_FAILED.value(), HttpStatus.INTERNAL_SERVER_ERROR),
+  INTERNAL_SERVER_ERROR("999", "Internal Server Error%s", HttpStatus.INTERNAL_SERVER_ERROR);
 
   final String code;
   final String message;

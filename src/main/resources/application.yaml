@@ -28,6 +28,22 @@ spring:
   servlet:
     multipart:
       max-file-size: 10MB
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      transaction-id-prefix: my-tx-prefix-
+    consumer:
+      group-id: log-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      enable-auto-commit: false
+      isolation-level: read_committed
+    listener:
+      ack-mode: manual_immediate
 
 logging:
   level:

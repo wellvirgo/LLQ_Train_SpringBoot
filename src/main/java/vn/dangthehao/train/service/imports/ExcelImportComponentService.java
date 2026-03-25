@@ -17,6 +17,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -87,6 +88,7 @@ public class ExcelImportComponentService {
 
     } catch (IOException | SAXException | OpenXML4JException | ParserConfigurationException e) {
       log.info("Error when reading excel file", e);
+      TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
     }
 
     return ImportExcelResponse.builder().status(ImportFileStatus.ERROR).build();
