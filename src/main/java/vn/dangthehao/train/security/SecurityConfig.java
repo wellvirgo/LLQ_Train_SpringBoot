@@ -85,6 +85,7 @@ public class SecurityConfig {
     configuration.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:8081"));
     configuration.addAllowedHeader("*");
     configuration.addAllowedMethod("*");
+    configuration.addExposedHeader("Content-Disposition");
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);

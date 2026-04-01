@@ -22,59 +22,59 @@ import vn.dangthehao.train.service.userLog.UserLogService;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Service
 public class UserActionLogConsumer implements ConsumerSeekAware {
-  UserLogService userLogService;
-  ObjectMapper objectMapper;
-  @NonFinal ConsumerSeekCallback seekCallback;
-
-  @Override
-  public void registerSeekCallback(ConsumerSeekCallback seekCallback) {
-    this.seekCallback = seekCallback;
-  }
-
-  @KafkaListener(topics = "user-activity-topic", groupId = "log-group")
-  public void consumeUserActivityLog(ConsumerRecord<String, String> record, Acknowledgment ack) {
-    try {
-      EventEnvelope envelope = objectMapper.readValue(record.value(), EventEnvelope.class);
-
-      switch (envelope.getEventType()) {
-        case "USER_ACTION_LOG":
-          {
-            UserActionLog userActionLog =
-                objectMapper.convertValue(envelope.getPayload(), UserActionLog.class);
-            userLogService.addUserActionLog(userActionLog);
-            break;
-          }
-        default:
-          log.warn("Unknown event type: {}", envelope.getEventType());
-      }
-
-      ack.acknowledge();
-
-    } catch (Exception e) {
-      log.error("Error {}", e.getMessage(), e);
-      throw new RuntimeException(e);
-    }
-  }
-
-  public void reConsumerUserActivityLogByOffset(int partition, long offset) {
-    final String topic = "user-activity-topic";
-    if (this.seekCallback != null) {
-      this.seekCallback.seek(topic, partition, offset);
-    } else {
-      log.error("Seek callback is null, offset = {}", offset);
-      throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR, " Error with kafka");
-    }
-  }
-
-  public void reConsumerUserActivityLogByTimestamp(int partition, long timestamp) {
-    final String topic = "user-activity-topic";
-    if (this.seekCallback != null) {
-      this.seekCallback.seekToTimestamp(topic, partition, timestamp);
-    } else {
-      log.error("Seek callback is null, timestamp={}", timestamp);
-      throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR, " Error with kafka");
-    }
-  }
+//  UserLogService userLogService;
+//  ObjectMapper objectMapper;
+//  @NonFinal ConsumerSeekCallback seekCallback;
+//
+//  @Override
+//  public void registerSeekCallback(ConsumerSeekCallback seekCallback) {
+//    this.seekCallback = seekCallback;
+//  }
+//
+//  @KafkaListener(topics = "user-activity-topic", groupId = "log-group")
+//  public void consumeUserActivityLog(ConsumerRecord<String, String> record, Acknowledgment ack) {
+//    try {
+//      EventEnvelope envelope = objectMapper.readValue(record.value(), EventEnvelope.class);
+//
+//      switch (envelope.getEventType()) {
+//        case "USER_ACTION_LOG":
+//          {
+//            UserActionLog userActionLog =
+//                objectMapper.convertValue(envelope.getPayload(), UserActionLog.class);
+//            userLogService.addUserActionLog(userActionLog);
+//            break;
+//          }
+//        default:
+//          log.warn("Unknown event type: {}", envelope.getEventType());
+//      }
+//
+//      ack.acknowledge();
+//
+//    } catch (Exception e) {
+//      log.error("Error {}", e.getMessage(), e);
+//      throw new RuntimeException(e);
+//    }
+//  }
+//
+//  public void reConsumerUserActivityLogByOffset(int partition, long offset) {
+//    final String topic = "user-activity-topic";
+//    if (this.seekCallback != null) {
+//      this.seekCallback.seek(topic, partition, offset);
+//    } else {
+//      log.error("Seek callback is null, offset = {}", offset);
+//      throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR, " Error with kafka");
+//    }
+//  }
+//
+//  public void reConsumerUserActivityLogByTimestamp(int partition, long timestamp) {
+//    final String topic = "user-activity-topic";
+//    if (this.seekCallback != null) {
+//      this.seekCallback.seekToTimestamp(topic, partition, timestamp);
+//    } else {
+//      log.error("Seek callback is null, timestamp={}", timestamp);
+//      throw new AppException(ErrorCode.INTERNAL_SERVER_ERROR, " Error with kafka");
+//    }
+//  }
 
   //  public void reConsumeUserActivityLog(int partition, long offset) {
   //    userActionLogs.clear();

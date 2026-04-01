@@ -16,20 +16,20 @@ import vn.dangthehao.train.entity.UserActionLog;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Service
 public class UserActionLogProcedure {
-  KafkaTemplate<String, String> kafkaTemplate;
-  ObjectMapper objectMapper;
-  static String TOPIC = "user-activity-topic";
-
-@Transactional("kafkaTransactionManager")
-  public void sendUserActionLog(UserActionLog userActionLog) {
-    try {
-      EventEnvelope envelope =
-          EventEnvelope.builder().eventType("USER_ACTION_LOG").payload(userActionLog).build();
-      kafkaTemplate.send(TOPIC, "log-test", objectMapper.writeValueAsString(envelope));
-//      throw new RuntimeException("Sending user action log failed");
-    } catch (Exception e) {
-      log.error(e.getMessage(), e);
-      throw new RuntimeException(e);
-    }
-  }
+//  KafkaTemplate<String, String> kafkaTemplate;
+//  ObjectMapper objectMapper;
+//  static String TOPIC = "user-activity-topic";
+//
+//@Transactional("kafkaTransactionManager")
+//  public void sendUserActionLog(UserActionLog userActionLog) {
+//    try {
+//      EventEnvelope envelope =
+//          EventEnvelope.builder().eventType("USER_ACTION_LOG").payload(userActionLog).build();
+//      kafkaTemplate.send(TOPIC, "log-test", objectMapper.writeValueAsString(envelope));
+////      throw new RuntimeException("Sending user action log failed");
+//    } catch (Exception e) {
+//      log.error(e.getMessage(), e);
+//      throw new RuntimeException(e);
+//    }
+//  }
 }

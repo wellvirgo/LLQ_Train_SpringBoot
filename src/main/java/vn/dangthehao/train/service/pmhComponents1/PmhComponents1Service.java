@@ -23,8 +23,6 @@ public interface PmhComponents1Service {
 
   FullDetailComponentResponse getComponentById(Long id);
 
-  void exportToExcel(HttpServletResponse response, SearchPmhComponentRequest request);
-
   void batchCreateComponents(List<PmhComponents1> pmhComponents1);
 
   int updateComponentStatus(List<Long> ids, String statusLabel);

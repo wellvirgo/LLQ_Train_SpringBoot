@@ -29,6 +29,7 @@ public enum ErrorCode {
   IO_ERROR("64", ErrCodeMessage.IO_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR),
   DATA_BATCH_UPDATE_FAILED(
       "65", ErrCodeMessage.DATA_BATCH_UPDATE_FAILED.value(), HttpStatus.INTERNAL_SERVER_ERROR),
+  BAD_REQUEST("66", "Bad request %s", HttpStatus.BAD_REQUEST),
   INTERNAL_SERVER_ERROR("999", "Internal Server Error%s", HttpStatus.INTERNAL_SERVER_ERROR);
 
   final String code;

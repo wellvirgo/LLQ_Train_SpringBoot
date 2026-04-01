@@ -1,24 +1,34 @@
 package vn.dangthehao.train.service.export;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.dangthehao.train.dto.component.DraftImportRow;
+import vn.dangthehao.train.dto.component.request.SearchPmhComponentRequest;
 import vn.dangthehao.train.entity.PmhComponents1;
 import vn.dangthehao.train.enums.ComponentCellHeader;
 import vn.dangthehao.train.enums.ComponentStatus;
 import vn.dangthehao.train.exception.AppException;
 import vn.dangthehao.train.exception.ErrorCode;
+import vn.dangthehao.train.service.pmhComponents1.dynamicSearch.ProcedureSearch;
+import vn.dangthehao.train.service.pmhComponents1.dynamicSearch.SearchComponentFactory;
+import vn.dangthehao.train.service.pmhComponents1.dynamicSearch.SearchComponentService;
 import vn.dangthehao.train.util.FileUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -26,14 +36,23 @@ import java.util.function.BiConsumer;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Service
 public class ComponentExportExcelServiceImpl implements ExportExcelService {
+  ExportJobService exportJobService;
+  SearchComponentService searchComponentService;
 
-  public void exportComponents(HttpServletResponse response, List<PmhComponents1> pmhComponents1) {
+  static int MAX_ROWS_PER_SHEET = 500;
+  static long CHUNK_SIZE = 1000;
+
+  public ComponentExportExcelServiceImpl(
+      ExportJobService exportJobService, SearchComponentFactory searchComponentFactory) {
+    this.exportJobService = exportJobService;
+    this.searchComponentService = searchComponentFactory.getSearchService(ProcedureSearch.class);
+  }
+
+  @Async
+  @Transactional
+  public void exportComponentsAsync(Long jobId, SearchPmhComponentRequest request) {
     this.export(
-        response,
-        "export_component",
-        ComponentCellHeader.values(),
-        pmhComponents1,
-        this::fillComponentRow);
+        jobId, "export_component", ComponentCellHeader.values(), request, this::fillComponentRow);
   }
 
   public Path exportFailedImport(List<DraftImportRow> failedRows) {
@@ -48,23 +67,81 @@ public class ComponentExportExcelServiceImpl implements ExportExcelService {
   }
 
   @SuppressWarnings("SameParameterValue")
-  private <T> void export(
-      HttpServletResponse response,
+  public void export(
+      Long jobId,
       String filenamePrefix,
       Object headers,
-      List<T> data,
-      BiConsumer<RowContext, T> rowFill) {
-    try (Workbook workbook = new XSSFWorkbook()) {
-      createFileContent(workbook, headers, data, rowFill);
+      SearchPmhComponentRequest criteria,
+      BiConsumer<RowContext, PmhComponents1> rowFill) {
+    this.exportJobService.updateStatus(jobId, "PROCESSING");
 
-      String filename = filenamePrefix + "_" + System.currentTimeMillis() + ".xlsx";
-      response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-      response.setHeader("Content-Disposition", "attachment; filename=" + filename);
-
-      workbook.write(response.getOutputStream());
-    } catch (Exception e) {
-      log.info(e.getMessage());
+    try {
+      Thread.sleep(Duration.of(10, ChronoUnit.SECONDS));
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
     }
+
+    Path tempFilePath = FileUtils.createTempFile(filenamePrefix, ".xlsx", "excel");
+
+    try (SXSSFWorkbook workbook = new SXSSFWorkbook(100);
+        OutputStream out =
+            Files.newOutputStream(
+                tempFilePath, StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
+      CellStyle headerStyle = createHeaderStyle(workbook);
+      CellStyle dateStyle = createDateStyle(workbook);
+      RowContext rowContext = new RowContext(dateStyle);
+
+      int sheetIndex = 1;
+      int rowIndex = 1;
+      int page = 1;
+      boolean hasMoreDate = true;
+      Sheet currentSheet = createNewSheet(workbook, sheetIndex, headers, headerStyle);
+
+      while (hasMoreDate) {
+        criteria.setPage(page);
+        criteria.setSize(CHUNK_SIZE);
+
+        List<PmhComponents1> data = searchComponentService.search(criteria).getData();
+        if (data.isEmpty()) {
+          hasMoreDate = false;
+        }
+
+        for (PmhComponents1 item : data) {
+          if (rowIndex > MAX_ROWS_PER_SHEET) {
+            sheetIndex++;
+            currentSheet = createNewSheet(workbook, sheetIndex, headers, dateStyle);
+            rowIndex = 1;
+          }
+
+          rowContext.setCurrentRow(currentSheet.createRow(rowIndex++));
+          rowContext.resetCellNum();
+          rowFill.accept(rowContext, item);
+        }
+        page++;
+      }
+
+      workbook.write(out);
+      String finalFilename = tempFilePath.getFileName().toString();
+      exportJobService.completeExportJob(
+          jobId, finalFilename, "http://localhost:8080/temp/excel/" + finalFilename);
+
+    } catch (IOException e) {
+      log.error("Failed to export excel file for JobId {}", jobId, e);
+      exportJobService.failExportJob(jobId);
+    }
+  }
+
+  private Sheet createNewSheet(
+      Workbook workbook, int sheetIndex, Object headers, CellStyle headerStyle) {
+    Sheet sheet = workbook.createSheet("Sheet" + sheetIndex);
+
+    if (headers instanceof ComponentCellHeader[]) {
+      createHeaderRow(sheet, headerStyle, (ComponentCellHeader[]) headers);
+    } else {
+      createHeaderRow(sheet, headerStyle, (String[]) headers);
+    }
+
+    return sheet;
   }
 
   @SuppressWarnings("SameParameterValue")

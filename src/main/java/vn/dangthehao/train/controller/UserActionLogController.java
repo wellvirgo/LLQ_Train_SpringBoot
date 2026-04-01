@@ -29,10 +29,10 @@ public class UserActionLogController {
     return ResponseEntity.ok(ApiResponseBuilder.success(userLogService.getUserActionLogs()));
   }
 
-  @PostMapping("/replay")
-  public ResponseEntity<Void> reConsumeUserActivityLog() {
-    //    userActionLogConsumer.reConsumerUserActivityLogByOffset(0, 0);
-    userActionLogConsumer.reConsumerUserActivityLogByTimestamp(0, 1773910845000L);
-    return ResponseEntity.accepted().build();
-  }
+//  @PostMapping("/replay")
+//  public ResponseEntity<Void> reConsumeUserActivityLog() {
+//    //    userActionLogConsumer.reConsumerUserActivityLogByOffset(0, 0);
+//    userActionLogConsumer.reConsumerUserActivityLogByTimestamp(0, 1773910845000L);
+//    return ResponseEntity.accepted().build();
+//  }
 }

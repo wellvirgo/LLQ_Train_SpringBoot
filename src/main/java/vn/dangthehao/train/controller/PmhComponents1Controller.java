@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -20,12 +22,15 @@ import vn.dangthehao.train.dto.component.response.ComponentStatusResponse;
 import vn.dangthehao.train.dto.component.response.FullDetailComponentResponse;
 import vn.dangthehao.train.dto.component.response.PmhComponentResponse;
 import vn.dangthehao.train.dto.component.response.SearchPmhComponentResponse;
+import vn.dangthehao.train.service.export.ExportExcelService;
+import vn.dangthehao.train.service.export.ExportJobService;
 import vn.dangthehao.train.service.imports.ExcelImportComponentService;
 import vn.dangthehao.train.service.pmhComponents1.PmhComponents1Service;
 import vn.dangthehao.train.util.ApiResponseBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -35,6 +40,8 @@ import java.util.List;
 public class PmhComponents1Controller {
   PmhComponents1Service pmhComponents1Service;
   ExcelImportComponentService excelImportComponentService;
+  ExportJobService exportJobService;
+  ExportExcelService exportExcelService;
 
   @PostMapping("/search")
   public ResponseEntity<ApiResponse<SearchPmhComponentResponse>> searchComponent(
@@ -86,9 +93,13 @@ public class PmhComponents1Controller {
   }
 
   @PostMapping("/export")
-  public void export(
-      HttpServletResponse response, @Valid @RequestBody SearchPmhComponentRequest request) {
-    pmhComponents1Service.exportToExcel(response, request);
+  public ResponseEntity<ApiResponse<Long>> export(
+      @Valid @RequestBody SearchPmhComponentRequest request, @AuthenticationPrincipal Jwt jwt) {
+    String username = jwt.getSubject();
+    Long exportJobId = exportJobService.createExportJob(username, request).getId();
+    exportExcelService.exportComponentsAsync(exportJobId, request);
+
+    return ResponseEntity.accepted().body(ApiResponseBuilder.success(exportJobId));
   }
 
   @PostMapping("/import")

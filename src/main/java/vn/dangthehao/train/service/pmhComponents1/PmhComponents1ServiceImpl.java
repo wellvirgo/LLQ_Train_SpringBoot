@@ -19,6 +19,8 @@ import vn.dangthehao.train.dto.component.NewDataComponent;
 import vn.dangthehao.train.dto.component.request.UpdatePmhComponentRequest;
 import vn.dangthehao.train.dto.component.response.*;
 import vn.dangthehao.train.dto.messageType.MsgTypeResponse;
+import vn.dangthehao.train.entity.AppUser;
+import vn.dangthehao.train.entity.ExportJob;
 import vn.dangthehao.train.entity.PmhComponents1;
 import vn.dangthehao.train.entity.UserActionLog;
 import vn.dangthehao.train.enums.ComponentActive;
@@ -29,7 +31,9 @@ import vn.dangthehao.train.exception.AppException;
 import vn.dangthehao.train.exception.ErrorCode;
 import vn.dangthehao.train.mapper.PmhComponentMapper;
 import vn.dangthehao.train.repository.PmhComponents1Repository;
+import vn.dangthehao.train.repository.UserRepository;
 import vn.dangthehao.train.service.export.ExportExcelService;
+import vn.dangthehao.train.service.export.ExportJobService;
 import vn.dangthehao.train.service.kafka.UserActionLogProcedure;
 import vn.dangthehao.train.service.messageType.MessageTypeService;
 import vn.dangthehao.train.service.pmhComponents1.dynamicSearch.*;
@@ -49,7 +53,6 @@ public class PmhComponents1ServiceImpl implements PmhComponents1Service {
   PmhComponentMapper pmhComponentMapper;
   ObjectMapper objectMapper;
   SearchComponentFactory searchComponentFactory;
-  ExportExcelService exportExcelService;
   MessageTypeService messageTypeService;
   EntityManager entityManager;
   UserActionLogProcedure userActionLogProcedure;
@@ -96,7 +99,7 @@ public class PmhComponents1ServiceImpl implements PmhComponents1Service {
             .log("add a new pmh component id: " + savedComponent.getId())
             .timestamp(createTime)
             .build();
-    userActionLogProcedure.sendUserActionLog(userActionLog);
+//    userActionLogProcedure.sendUserActionLog(userActionLog);
 
     return pmhComponentMapper.toComponentResponse(savedComponent);
   }
@@ -142,17 +145,6 @@ public class PmhComponents1ServiceImpl implements PmhComponents1Service {
     detailComponent.setMsgTypeDetail(msgTypeDetail);
 
     return detailComponent;
-  }
-
-  @Override
-  public void exportToExcel(HttpServletResponse response, SearchPmhComponentRequest request) {
-    SearchComponentService searchService =
-        searchComponentFactory.getSearchService(ProcedureSearch.class);
-    long totalElements = searchService.search(request).getPageInfo().getTotalElements();
-    request.setSize(totalElements);
-
-    List<PmhComponents1> components = searchService.search(request).getData();
-    exportExcelService.exportComponents(response, components);
   }
 
   @Override

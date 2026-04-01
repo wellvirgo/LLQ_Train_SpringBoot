@@ -1,5 +1,6 @@
 package vn.dangthehao.train.dto.component.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
@@ -43,6 +44,7 @@ public class SearchPmhComponentRequest extends PageableRequest {
 
   SearchTech searchTech;
 
+  @JsonIgnore
   public SearchTech getSearchTechOrDefault() {
     if (this.getSearchTech() == null) return DEFAULT_SEARCH_TECH;
     return this.getSearchTech();
